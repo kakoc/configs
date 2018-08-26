@@ -5,7 +5,7 @@ print_before_the_prompt(){
 }
 PROMPT_COMMAND=print_before_the_prompt
 
-PS1='\e[92m ➜\e[97m '
+PS1='\[\033[38;5;40m\]➜  \[$(tput sgr0)\]'
 
 export PATH=/usr/local/Cellar/gcc/7.2.0/bin:homebrew/php/php71:$PATH
 
