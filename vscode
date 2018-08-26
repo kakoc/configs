@@ -1,0 +1,53 @@
+{
+    "files.autoSave": "onFocusChange",
+    "vim.disableAnnoyingNeovimMessage": true,
+    "window.zoomLevel": 0,
+    "vim.insertModeKeyBindings": [
+        {
+            "before": ["j","j"],
+            "after": ["<Esc>"]
+        }
+    ],
+    // "vim.statusBarColorControl": true,
+    // "vim.statusBarColors" : {
+    //     "normal": "#005f5f",
+    //     "insert": "#0bb60b",
+    //     "visual": "#5f00af",
+    //     "visualline": "#005f87",
+    //     "visualblock": "#86592d",
+    //     "replace": "#000000"
+    // },
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#005f5f",
+        "statusBar.noFolderBackground": "#005f5f",
+        "statusBar.debuggingBackground": "#005f5f",
+        "editorWhitespace.foreground": "#5C6F6F"
+
+    },
+    "workbench.colorTheme": "Atom One Dark",
+    "editor.renderWhitespace": "boundary",
+    "editor.insertSpaces": false,
+    "todohighlight.keywords": [
+        {
+            "text": "Task",
+            "color": "white",
+            "backgroundColor": "rgb(253,188,62)",
+            "backgroundColor": "rgb(238,100,146)",
+            "overviewRulerColor": "grey"
+        }
+    ],
+    "files.exclude": {
+        "**/.git": false,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true
+    },
+    "explorer.confirmDelete": false,
+    "editor.minimap.enabled": false,
+    "explorer.confirmDragAndDrop": false,
+    "liveServer.settings.donotShowInfoMsg": true,
+    "editor.autoIndent": false,
+    "editor.fontLigatures": true,
+    "editor.fontFamily": "Fira Code"
+}
