@@ -7,6 +7,13 @@ PROMPT_COMMAND=print_before_the_prompt
 
 PS1='\[\033[38;5;40m\]➜  \[$(tput sgr0)\]'
 
+if [ -f "/usr/local/opt/bash-git-prompt/share/gitprompt.sh" ]; then
+    __GIT_PROMPT_DIR="/usr/local/opt/bash-git-prompt/share"
+    source "/usr/local/opt/bash-git-prompt/share/gitprompt.sh"
+fi
+
+GIT_PROMPT_THEME=Evermeet
+
 export PATH=/usr/local/Cellar/gcc/7.2.0/bin:homebrew/php/php71:$PATH
 
 s=./study/
