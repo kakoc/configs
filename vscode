@@ -1,53 +1,130 @@
 {
-    "files.autoSave": "onFocusChange",
-    "vim.disableAnnoyingNeovimMessage": true,
-    "window.zoomLevel": 0,
-    "vim.insertModeKeyBindings": [
-        {
-            "before": ["j","j"],
-            "after": ["<Esc>"]
-        }
-    ],
-    // "vim.statusBarColorControl": true,
-    // "vim.statusBarColors" : {
-    //     "normal": "#005f5f",
-    //     "insert": "#0bb60b",
-    //     "visual": "#5f00af",
-    //     "visualline": "#005f87",
-    //     "visualblock": "#86592d",
-    //     "replace": "#000000"
-    // },
-    "workbench.colorCustomizations": {
-        "statusBar.background": "#005f5f",
-        "statusBar.noFolderBackground": "#005f5f",
-        "statusBar.debuggingBackground": "#005f5f",
-        "editorWhitespace.foreground": "#5C6F6F"
+  "window.zoomLevel": -1,
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#005f5f",
+    "statusBar.noFolderBackground": "#005f5f",
+    "statusBar.debuggingBackground": "#005f5f",
+    "editorWhitespace.foreground": "#5C6F6F"
+  },
+  "workbench.colorTheme": "Atom One Dark",
+  // "todohighlight.keywords": [
+  //   {
+  //     "text": "Task",
+  //     "color": "white",
+  //     // "backgroundColor": "rgb(253,188,62)",
+  //     "backgroundColor": "rgb(238,100,146)",
+  //     "overviewRulerColor": "grey"
+  //   }
+  // ],
+  "files.exclude": {
+    "**/.git": false,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true
+  },
+  "explorer.confirmDelete": false,
+  "editor.minimap.enabled": false,
+  "explorer.confirmDragAndDrop": false,
+  // "liveServer.settings.donotShowInfoMsg": true,
 
+  "editor.autoIndent": true,
+  "editor.renderWhitespace": "boundary",
+
+  //font
+  "editor.fontLigatures": true,
+  "editor.fontFamily": "Fira Code",
+
+  //saving
+  "files.autoSaveDelay": 3000,
+  "files.autoSave": "afterDelay",
+
+  //formatting
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.snippetSuggestions": "top",
+
+  //vim
+  "vim.easymotion": true,
+  "vim.sneak": true,
+  "vim.incsearch": true,
+  "vim.useSystemClipboard": true,
+  "vim.useCtrlKeys": true,
+  "vim.hlsearch": true,
+  "vim.insertModeKeyBindings": [
+    {
+      "before": ["j", "j"],
+      "after": ["<Esc>"]
+    }
+  ],
+  "vim.normalModeKeyBindingsNonRecursive": [
+    {
+      "before": ["<leader>", "d"],
+      "after": ["d", "d"]
     },
-    "workbench.colorTheme": "Atom One Dark",
-    "editor.renderWhitespace": "boundary",
-    "editor.insertSpaces": false,
-    "todohighlight.keywords": [
-        {
-            "text": "Task",
-            "color": "white",
-            "backgroundColor": "rgb(253,188,62)",
-            "backgroundColor": "rgb(238,100,146)",
-            "overviewRulerColor": "grey"
-        }
-    ],
-    "files.exclude": {
-        "**/.git": false,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true
+    {
+      "before": ["<leader>", "s"],
+      "after": ["d", "d", "O"]
     },
-    "explorer.confirmDelete": false,
-    "editor.minimap.enabled": false,
-    "explorer.confirmDragAndDrop": false,
-    "liveServer.settings.donotShowInfoMsg": true,
-    "editor.autoIndent": false,
-    "editor.fontLigatures": true,
-    "editor.fontFamily": "Fira Code"
+    {
+      "before": ["<leader>", "c"],
+      "after": ["v", "i", "w", "p"]
+    },
+    {
+      "before": ["<C-n>"],
+      "commands": [":nohl"]
+    }
+  ],
+  "vim.leader": "<space>",
+  "vim.handleKeys": {
+    "<C-a>": false,
+    "<C-f>": false,
+    "<C-v>": false
+  },
+  "vim.foldfix": true,
+
+  //git
+  "git.path": "/usr/bin/git",
+  "git.autoRepositoryDetection": "subFolders",
+
+  //tag renaming
+  "auto-rename-tag.activationOnLanguage": [
+    "html",
+    "xml",
+    "php",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  //close tags
+  "auto-close-tag.activationOnLanguage": [
+    "xml",
+    "php",
+    "blade",
+    "ejs",
+    "jinja",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "plaintext",
+    "markdown",
+    "vue",
+    "liquid",
+    "erb",
+    "lang-cfml",
+    "cfml",
+    "HTML (Eex)"
+  ],
+
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.enablePreviewFromQuickOpen": false,
+
+  //ts
+  "prettier.tslintIntegration": true,
+
+  //wallaby
+  "wallaby.node": "/Users/kakoc/.nvm/versions/node/v10.9.0/bin/node"
 }
