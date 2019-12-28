@@ -1,43 +1,49 @@
 * Initializing
 #+BEGIN_SRC emacs-lisp
+  ;; (setq max-lisp-eval-depth 20200)
+  ;; (setq max-specpdl-size 3000)
 
-(use-package exec-path-from-shell
-    :ensure t)
 
-(when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize))
 
-(fset 'yes-or-no-p 'y-or-n-p)
+    (use-package exec-path-from-shell
+	:ensure t)
 
-;; (setq scroll-step 1)
+    (when (memq window-system '(mac ns x))
+	(exec-path-from-shell-initialize))
 
-(setq mac-option-modifier 'super)
-(setq mac-command-modifier 'meta)
+    (fset 'yes-or-no-p 'y-or-n-p)
 
-(setq make-backup-files nil) ; stop creating backup~ files
-(setq auto-save-default nil) ; stop creating #autosave# files
-(setq create-lockfiles nil)  
+    ;; (setq scroll-step 1)
 
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
+    (setq mac-option-modifier 'super)
+    (setq mac-command-modifier 'meta)
 
-(defun paste-from-x-clipboard()
-    (interactive)
-    (shell-command
-	(cond
-	    (*cygwin* "getclip")
-	    (*is-a-mac* "pbpaste")
-	    (t "xsel -ob"))
-	1))
+    (setq make-backup-files nil) ; stop creating backup~ files
+    (setq auto-save-default nil) ; stop creating #autosave# files
+    (setq create-lockfiles nil)  
 
-(defun my/paste-in-minibuffer ()
-    (local-set-key (kbd "M-y") 'paste-from-x-clipboard))
+    (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+    (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
 
-(add-hook 'minibuffer-setup-hook 'my/paste-in-minibuffer)
+    (defun paste-from-x-clipboard()
+	(interactive)
+	(shell-command
+	    (cond
+		(*cygwin* "getclip")
+		(*is-a-mac* "pbpaste")
+		(t "xsel -ob"))
+	    1))
 
-(setq auto-window-vscroll nil)
+    (defun my/paste-in-minibuffer ()
+	(local-set-key (kbd "M-y") 'paste-from-x-clipboard))
 
-#+END_SRC
+    (add-hook 'minibuffer-setup-hook 'my/paste-in-minibuffer)
+
+    (setq auto-window-vscroll nil)
+    
+(setq scroll-preserve-screen-position 1)
+
+  #+END_SRC
 
 ** Autosave
 #+BEGIN_SRC emacs-lisp
@@ -341,7 +347,7 @@
 
     (setq default-frame-alist '((cursor-color . "#E552F7")))
 
-    (global-hl-line-mode +1)
+    (global-hl-line-mode -1)
 
     (use-package color-theme-sanityinc-tomorrow
 	:ensure t)
@@ -361,6 +367,8 @@
 
   (setq-default left-fringe-width  1)
   ;; (setq-default right-fringe-width 3)
+   (set-background-color "#121212")
+
 
   (fringe-helper-define 'git-gutter-fr:added nil
     "XXXXXXXX"
@@ -431,8 +439,7 @@
     ;; (set-window-buffer nil (current-buffer)) ; Use them now.
     ;; (set-window-margins (selected-window) nil nil)
     (set-fringe-mode 0)
-    ;; (setq mode-line-format nil)
-    (setq-default mode-line-format nil)
+    (setq mode-line-format t)
 
 #+END_SRC
 
@@ -535,6 +542,13 @@
 ** Evil
 
 #+BEGIN_SRC emacs-lisp
+;; disabl in help mode
+  (global-unset-key (kbd "C-h"))
+  (global-set-key (kbd "C-h") 'evil-window-left)
+  
+  (global-unset-key (kbd "C-l"))
+  (global-set-key (kbd "C-l") 'evil-window-right)
+
 
   (use-package evil 
       :ensure t
@@ -620,8 +634,8 @@
 
   (define-key evil-normal-state-map (kbd "C-!") 'split-window-horizontally)
   (define-key evil-normal-state-map (kbd "C-#") 'split-window-vertically)
-  (define-key evil-normal-state-map (kbd "C-@") 'next-multiframe-window)
-  (define-key evil-normal-state-map (kbd "C-/") 'next-multiframe-window)
+  (define-key evil-normal-state-map (kbd "C-@") 'other-frame)
+;;  (define-key evil-normal-state-map (kbd "C-/") 'next-multiframe-window)
 
   (global-unset-key "\M-h")
   (define-key evil-normal-state-map (kbd "M-h") 'previous-buffer)
@@ -641,6 +655,9 @@
   (define-key evil-insert-state-map (kbd "M-h") 'evil-normal-state)
 
   (define-key dired-mode-map (kbd "n") 'evil-search-next)
+  
+  (define-key evil-normal-state-map (kbd "{") 'scroll-down)
+  (define-key evil-normal-state-map (kbd "}") 'scroll-up)
 
 
 #+END_SRC
@@ -751,60 +768,6 @@
       (defvar rasmus/ob-header-symbol ?☰
       "Symbol used for babel headers")
 
-      ;; (defun rasmus/org-prettify-src--update ()
-      ;; (let 
-      ;;     ((case-fold-search t)
-      ;; 	    (re "^[ \t]*#\\+begin_src[ \t]+[^ \f\t\n\r\v]+[ \t]*")
-      ;; 	    found)
-      ;; 	(save-excursion
-      ;; 	(goto-char (point-min))
-      ;; 	(while (re-search-forward re nil t)
-      ;; 	    (goto-char (match-end 0))
-      ;; 	    (let ((args (org-trim
-      ;; 			(buffer-substring-no-properties (point)
-      ;; 							(line-end-position)))))
-      ;; 	    (when (org-string-nw-p args)
-      ;; 		(let ((new-cell (cons args rasmus/ob-header-symbol)))
-      ;; 		(cl-pushnew new-cell prettify-symbols-alist :test #'equal)
-      ;; 		(cl-pushnew new-cell found :test #'equal)))))
-      ;; 	(setq prettify-symbols-alist
-      ;; 	    (cl-set-difference prettify-symbols-alist
-      ;; 	    (cl-set-difference
-      ;; 	    (cl-remove-if-not
-      ;; 	    (lambda (elm)
-      ;; 		(eq (cdr elm) rasmus/ob-header-symbol))
-      ;; 	    prettify-symbols-alist)
-      ;; 	    found :test #'equal)))
-      ;; 	;; Clean up old font-lock-keywords.
-      ;; 	(font-lock-remove-keywords nil prettify-symbols--keywords)
-      ;; 	(setq prettify-symbols--keywords (prettify-symbols--make-keywords))
-      ;; 	(font-lock-add-keywords nil prettify-symbols--keywords)
-      ;; 	(while (re-search-forward re nil t)
-      ;; 	    (font-lock-flush (line-beginning-position) (line-end-position))))))
-
-      ;; (defun rasmus/org-prettify-src ()
-      ;; "Hide src options via `prettify-symbols-mode'.
-
-      ;; `prettify-symbols-mode' is used because it has uncollpasing. It's
-      ;; may not be efficient."
-      ;; (let* ((case-fold-search t)
-      ;; 	    (at-src-block (save-excursion
-      ;; 			    (beginning-of-line)
-      ;; 			    (looking-at "^[ \t]*#\\+begin_src[ \t]+[^ \f\t\n\r\v]+[ \t]*"))))
-      ;; 	;; Test if we moved out of a block.
-      ;; 	(when (or (and rasmus/org-at-src-begin
-      ;; 			(not at-src-block))
-      ;; 		;; File was just opened.
-      ;; 		(eq rasmus/org-at-src-begin -1))
-      ;; 	(rasmus/org-prettify-src--update))
-      ;; 	;; Remove composition if at line; doesn't work properly.
-      ;; 	;; (when at-src-block
-      ;; 	;;   (with-silent-modifications
-      ;; 	;;     (remove-text-properties (match-end 0)
-      ;; 	;;                             (1+ (line-end-position))
-      ;; 	;;                             '(composition))))
-      ;; 	(setq rasmus/org-at-src-begin at-src-block)))
-
       (defun rasmus/org-prettify-symbols ()
       (mapc (apply-partially 'add-to-list 'prettify-symbols-alist)
 	    (cl-reduce 'append
@@ -817,7 +780,13 @@
       (turn-on-prettify-symbols-mode))
       ;; (add-hook 'post-command-hook 'rasmus/org-prettify-src t t))
       (add-hook 'org-mode-hook #'rasmus/org-prettify-symbols))
-  ;; --------
+      
+(defun org-summary-todo (n-done n-not-done)
+  "Switch entry to DONE when all subentries are done, to TODO otherwise."
+  (let (org-log-done org-log-states)   ; turn off logging
+    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
+(add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
 
 #+END_SRC
 
@@ -900,6 +869,7 @@
   (add-to-list 'org-emphasis-alist
   '("*" (:foreground "#E552F7")
       ))
+      
 
 #+END_SRC
 
@@ -951,52 +921,58 @@
 
 #+BEGIN_SRC emacs-lisp
 
-;; (use-package js2-mode
-;;     :ensure t  
-;;     :mode "\\.js\\'")
+	;; (use-package js2-mode
+	;;     :ensure t  
+	;;     :mode "\\.js\\'")
 
-;; (defun setup-tide-mode ()
-;;     "Set up Tide mode."
-;;     (interactive)
-;;     (tide-setup)
-;;     (flycheck-mode +1)
-;;     (setq flycheck-check-syntax-automatically '(save-mode-enabled))
-;;     (eldoc-mode +1)
-;;     (tide-hl-identifier-mode +1)
-;;     (company-mode +1)
-;;     (prettier-js-mode)
-;;     (hs-minor-mode))
+	(defun setup-tide-mode ()
+	    "Set up Tide mode."
+	    (interactive)
+	    (tide-setup)
+	    (flycheck-mode +1)
+	    (setq flycheck-check-syntax-automatically '(save-mode-enabled))
+	    (eldoc-mode +1)
+	    (tide-hl-identifier-mode +1)
+	    (company-mode +1)
+	    ;; (prettier-js-mode)
+	    (hs-minor-mode))
 
-;; (use-package tide
-;;     :ensure t
-;;     :config
-;;     (setq company-tooltip-align-annotations t)
-;;     (add-hook 'typescript-mode-hook #'setup-tide-mode)
-;;     (add-hook 'js2-mode-hook #'setup-tide-mode))
+	(use-package tide
+	    :ensure t
+	    :config
+	    (setq company-tooltip-align-annotations t)
+	    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+	    (add-hook 'js2-mode-hook #'setup-tide-mode))
 
-;; (add-hook 'js2-mode-hook #'setup-tide-mode)
-;; (setq js2-mode-show-parse-errors nil
-;;       js2-mode-show-strict-warnings nil)
+	;; (add-hook 'js2-mode-hook #'setup-tide-mode)
+	;; (setq js2-mode-show-parse-errors nil
+	;;       js2-mode-show-strict-warnings nil)
 
-(use-package indium
-    :ensure t)
-;; (add-hook 'js2-mode-hook #'indium-interaction-mode)
+	;; (use-package indium
+	    ;; :ensure t)
+	;; (add-hook 'js2-mode-hook #'indium-interaction-mode)
 
-;; (add-hook 'js2-mode-hook #'setup-tide-mode)
-;; (setq js2-mode-show-parse-errors nil
-;; 	js2-mode-show-strict-warnings nil)
+	;; (add-hook 'js2-mode-hook #'setup-tide-mode)
+	;; (setq js2-mode-show-parse-errors nil
+	;; 	js2-mode-show-strict-warnings nil)
+  (use-package lsp-mode
+    :hook ((mhtml-mode . lsp) (html-mode . lsp))
+    :commands lsp)
 
-(use-package prettier-js
-    :ensure t
-    :init
-    (add-hook 'js2-mode-hook 'prettier-js-mode)
-    (add-hook 'js-mode-hook 'prettier-js-mode)
-    (add-hook 'tide-mode-hook 'prettier-js-mode)
-    (add-hook 'typescript-mode-hook 'prettier-js-mode))
-;; (eval-after-load 'typescript-mode
-;;     '(progn
-;;        (add-hook 'typescrript-mode-hook #'add-node-modules-path)
-;;        (add-hook 'typescrript-mode-hook  #'prettier-js-mode)))
+
+    (use-package prettier-js
+	:ensure t)
+
+    (eval-after-load 'typescript-mode
+	'(progn
+	    (add-hook 'typescript-mode-hook #'add-node-modules-path)
+	    (add-hook 'typescript-mode-hook #'prettier-js-mode)))
+
+  (add-hook 'json-mode-hook 
+    (lambda ()
+      (prettier-js-mode -1)))
+
+
 
 
 #+END_SRC
@@ -1005,78 +981,78 @@
 
 #+BEGIN_SRC emacs-lisp
 
-;; (use-package lsp-mode
-;;   :ensure t
-;;   :init
-;;   (add-hook 'prog-major-mode #'lsp-prog-major-mode-enable)
-;;   ;; (lsp-ui-mode nil)
-;;   ;; (flymake-mode nil)
-;;   :config
-;;   ;; (setq lsp-response-timeout 25)
-;;   (setq lsp-auto-configure t)
-;;   (setq lsp-prefer-flymake nil)
-;;   )
+  ;; (use-package lsp-mode
+  ;;   :ensure t
+  ;;   :init
+  ;;   (add-hook 'prog-major-mode #'lsp-prog-major-mode-enable)
+  ;;   ;; (lsp-ui-mode nil)
+  ;;   ;; (flymake-mode nil)
+  ;;   :config
+  ;;   ;; (setq lsp-response-timeout 25)
+  ;;   (setq lsp-auto-configure t)
+  ;;   (setq lsp-prefer-flymake nil)
+  ;;   )
 
 
-;; (use-package lsp-ui
-;; 	 :ensure t
-;; 	 :init
-;; 	 (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-;; 	 :config
-;; 	 ;; (setq lsp-ui-sideline-enable t
-;; 	 ;; 	  lsp-ui-sideline-show-symbol t
-;; 	 ;; 	  lsp-ui-sideline-show-hover t
-;; 	 ;; 	  lsp-ui-sideline-show-code-actions t
-;; 	 ;; 	  lsp-ui-sideline-update-mode 'point)
-;; 	 (setq lsp-ui-doc-enable nil
-;; 	   lsp-ui-peek-enable nil
-;; 	   lsp-ui-sideline-enable nil
-;; 	   lsp-ui-imenu-enable nil
-;; 	   ;; lsp-ui-flycheck-enable nil
-;; 	   ))
+  ;; (use-package lsp-ui
+  ;; 	 :ensure t
+  ;; 	 :init
+  ;; 	 (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  ;; 	 :config
+  ;; 	 ;; (setq lsp-ui-sideline-enable t
+  ;; 	 ;; 	  lsp-ui-sideline-show-symbol t
+  ;; 	 ;; 	  lsp-ui-sideline-show-hover t
+  ;; 	 ;; 	  lsp-ui-sideline-show-code-actions t
+  ;; 	 ;; 	  lsp-ui-sideline-update-mode 'point)
+  ;; 	 (setq lsp-ui-doc-enable nil
+  ;; 	   lsp-ui-peek-enable nil
+  ;; 	   lsp-ui-sideline-enable nil
+  ;; 	   lsp-ui-imenu-enable nil
+  ;; 	   ;; lsp-ui-flycheck-enable nil
+  ;; 	   ))
 
 
-;; (require 'lsp)
-;; (require 'lsp-clients)
-;; (add-hook 'js-mode-hook #'lsp)
+  ;; (require 'lsp)
+  ;; (require 'lsp-clients)
+  ;; (add-hook 'js-mode-hook #'lsp)
 
 
 
-;; (defcustom lsp-on-change-idle-timer-timeout 0.2
-;;   "Timeout to send `textDocument/didChange' notification"
-;;   :group 'lsp-mode
-;;   :type 'number)
+  ;; (defcustom lsp-on-change-idle-timer-timeout 0.2
+  ;;   "Timeout to send `textDocument/didChange' notification"
+  ;;   :group 'lsp-mode
+  ;;   :type 'number)
 
-;; (defvar lsp-on-change-idle-timer-id nil)
+  ;; (defvar lsp-on-change-idle-timer-id nil)
 
-;; (defun my-lsp-on-change-timer-advice (orig-func &rest args)
-;;   "Add an idle timer to lsp-on-change"
-;;   (-some->> lsp-on-change-idle-timer-id (cancel-timer))
-;;   (setq lsp-on-change-idle-timer-id
-;; 	(run-with-idle-timer lsp-on-change-idle-timer-timeout nil
-;; 			     (lambda ()
-;; 			       (funcall orig-func (point-min) (point-max) (- (point-max) (point-min)))
-;; 			       (setq lsp-on-change-idle-timer-id nil)))))
+  ;; (defun my-lsp-on-change-timer-advice (orig-func &rest args)
+  ;;   "Add an idle timer to lsp-on-change"
+  ;;   (-some->> lsp-on-change-idle-timer-id (cancel-timer))
+  ;;   (setq lsp-on-change-idle-timer-id
+  ;; 	(run-with-idle-timer lsp-on-change-idle-timer-timeout nil
+  ;; 			     (lambda ()
+  ;; 			       (funcall orig-func (point-min) (point-max) (- (point-max) (point-min)))
+  ;; 			       (setq lsp-on-change-idle-timer-id nil)))))
 
-;; (advice-add 'lsp-on-change :around 'my-lsp-on-change-timer-advice)
+  ;; (advice-add 'lsp-on-change :around 'my-lsp-on-change-timer-advice)
 
-;; (add-hook 'typescript-mode-hook #'lsp)
-;; (require 'lsp-javascript-typescript)
-
-
-;; (use-package lsp-javascript-typescript
-;;   :ensure t
-;;   :init
-;;   (add-to-list 'js-mode-hook #'lsp-javascript-typescript-enable)
-;;   (add-to-list 'typescript-mode-hook #'lsp-javascript-typescript-enable))
+  ;; (add-hook 'typescript-mode-hook #'lsp)
+  ;; (require 'lsp-javascript-typescript)
 
 
-(use-package eglot
-    :ensure t)
+  ;; (use-package lsp-javascript-typescript
+  ;;   :ensure t
+  ;;   :init
+  ;;   (add-to-list 'js-mode-hook #'lsp-javascript-typescript-enable)
+  ;;   (add-to-list 'typescript-mode-hook #'lsp-javascript-typescript-enable))
 
-;; (add-hook 'js-mode-hook 'eglot-ensure)
-(add-hook 'typescript-mode-hook 'eglot-ensure)
-;; (add-hook 'tide 'eglot-ensure)
+
+  (use-package eglot
+      :ensure t)
+
+  ;; (add-hook 'js-mode-hook 'eglot-ensure)
+  ;; (add-hook 'typescript-mode-hook 'eglot-ensure)
+  ;; (add-hook 'tide 'eglot-ensure)
 
 #+END_SRC
 
@@ -1235,7 +1211,11 @@
 (require 'ob-clojure)
 (setq org-babel-clojure-backend 'cider)
 
+(setq cljr-middleware-ignored-paths '("test\.*"))
+(remove-hook 'text-mode-hook 'turn-on-auto-fill)
+
 (add-hook 'clojure-mode-hook 'prettify-symbols-mode)
+(add-hook 'clojure-mode-hook 'idle-highlight-mode)
 
 (use-package pg
     :ensure t)
@@ -1250,15 +1230,23 @@
 
 (use-package racer
     :ensure t)
-    
+
 (add-hook 'rust-mode-hook #'racer-mode)
 (add-hook 'racer-mode-hook #'eldoc-mode)
 
 (add-hook 'racer-mode-hook #'company-mode)
 (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
 (setq company-tooltip-align-annotations t)
+(setq rust-format-on-save t)
 
-(add-hook 'rust-mode-hook #'(lambda () (autopair-mode)))
+(add-hook
+   'rust-mode-hook
+   (lambda ()
+     (setq-local electric-pair-inhibit-predicate
+		 `(lambda (c)
+		    (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))
+     (electric-pair-mode)))
+(add-hook 'rust-mode-hook #'(lambda () (flycheck-mode)))
 
 (use-package cargo
     :ensure t)
@@ -1282,4 +1270,29 @@
     (setq google-translate-default-source-language "en")
     (setq google-translate-default-target-language "ru"))
     
+#+END_SRC
+* Dash
+
+#+BEGIN_SRC emacs-lisp
+
+(setq counsel-dash-browser-func 'eww-browse-url)
+  
+
+#+END_SRC
+
+* Pomidor
+#+BEGIN_SRC emacs-lisp
+
+(setq alert-default-style 'mode-line)
+(use-package pomidor
+  :ensure t
+  :config (setq pomidor-sound-tick nil
+                pomidor-sound-tack nil)
+  :hook (pomidor-mode . (lambda ()
+                          (display-line-numbers-mode -1) ; Emacs 26.1+
+                          (setq left-fringe-width 0 right-fringe-width 0)
+                          (setq left-margin-width 2 right-margin-width 0)
+                          ;; force fringe update
+                          (set-window-buffer nil (current-buffer)))))
+
 #+END_SRC
