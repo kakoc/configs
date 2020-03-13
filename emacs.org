@@ -1,47 +1,49 @@
 * Initializing
 #+BEGIN_SRC emacs-lisp
-  ;; (setq max-lisp-eval-depth 20200)
-  ;; (setq max-specpdl-size 3000)
+    ;; (setq max-lisp-eval-depth 20200)
+    ;; (setq max-specpdl-size 3000)
 
 
 
-    (use-package exec-path-from-shell
-	:ensure t)
+      (use-package exec-path-from-shell
+	  :ensure t)
 
-    (when (memq window-system '(mac ns x))
-	(exec-path-from-shell-initialize))
+      (when (memq window-system '(mac ns x))
+	  (exec-path-from-shell-initialize))
 
-    (fset 'yes-or-no-p 'y-or-n-p)
+      (fset 'yes-or-no-p 'y-or-n-p)
 
-    ;; (setq scroll-step 1)
+      ;; (setq scroll-step 1)
 
-    (setq mac-option-modifier 'super)
-    (setq mac-command-modifier 'meta)
+      (setq mac-option-modifier 'super)
+      (setq mac-command-modifier 'meta)
 
-    (setq make-backup-files nil) ; stop creating backup~ files
-    (setq auto-save-default nil) ; stop creating #autosave# files
-    (setq create-lockfiles nil)  
+      (setq make-backup-files nil) ; stop creating backup~ files
+      (setq auto-save-default nil) ; stop creating #autosave# files
+      (setq create-lockfiles nil)  
 
-    (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-    (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
+      (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+      (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
 
-    (defun paste-from-x-clipboard()
-	(interactive)
-	(shell-command
-	    (cond
-		(*cygwin* "getclip")
-		(*is-a-mac* "pbpaste")
-		(t "xsel -ob"))
-	    1))
+      ;; (defun paste-from-x-clipboard()
+      ;; 	(interactive)
+      ;; 	(shell-command
+      ;; 	    (cond
+      ;; 		;; (*cygwin* "getclip")
+      ;; 		;; (*is-a-mac* "pbpaste")
+      ;; 		(t "xsel -ob"))
+      ;; 	    1))
 
-    (defun my/paste-in-minibuffer ()
-	(local-set-key (kbd "M-y") 'paste-from-x-clipboard))
+      ;; (defun my/paste-in-minibuffer ()
+      ;; 	(local-set-key (kbd "M-v") 'paste-from-x-clipboard))
 
-    (add-hook 'minibuffer-setup-hook 'my/paste-in-minibuffer)
+      ;; (add-hook 'minibuffer-setup-hook 'my/paste-in-minibuffer)
 
-    (setq auto-window-vscroll nil)
+      (setq auto-window-vscroll nil)
     
-(setq scroll-preserve-screen-position 1)
+  (setq scroll-preserve-screen-position 1)
+
+(cua-mode t)
 
   #+END_SRC
 
@@ -334,6 +336,7 @@
     (toggle-scroll-bar -1)
 
     (tool-bar-mode -1)
+    (menu-bar-mode -1)
 
     (set-frame-parameter nil 'fullscreen 'fullboth)
 
@@ -353,11 +356,11 @@
 	:ensure t)
     (color-theme-sanityinc-tomorrow--define-theme night)
 
-    (use-package color-theme
-	    :ensure t
-	    :init (require 'color-theme)
-	    :config (use-package color-theme-sanityinc-tomorrow
-		    :ensure t))
+    ;; (use-package color-theme
+    ;; 	  :ensure t
+    ;; 	  :init (require 'color-theme)
+    ;; 	  :config (use-package color-theme-sanityinc-tomorrow
+    ;; 		  :ensure t))
 
     (use-package git-gutter-fringe
 	:ensure t
@@ -490,6 +493,11 @@
 
 * Navigation
 
+  #+BEGIN_SRC emacs-lisp
+
+(use-package hyperbole :ensure t)
+  
+  #+END_SRC
 ** Hierarchy
 #+BEGIN_SRC emacs-lisp
 
@@ -921,56 +929,145 @@
 
 #+BEGIN_SRC emacs-lisp
 
-	;; (use-package js2-mode
-	;;     :ensure t  
-	;;     :mode "\\.js\\'")
+	(defun in-template-file ()
+	  (let* ((filename (buffer-file-name))
+		 (extension (car (last (split-string filename "\\.")))))
+	    (string= "html" extension)))
 
-	(defun setup-tide-mode ()
-	    "Set up Tide mode."
-	    (interactive)
-	    (tide-setup)
-	    (flycheck-mode +1)
-	    (setq flycheck-check-syntax-automatically '(save-mode-enabled))
-	    (eldoc-mode +1)
-	    (tide-hl-identifier-mode +1)
-	    (company-mode +1)
-	    ;; (prettier-js-mode)
-	    (hs-minor-mode))
+	(defun jump-to-file-by-extension (extension)
+	  (let* ((filename (buffer-file-name))
+		 (file-components (append (butlast (split-string filename
+								 "\\."))
+					  (list extension))))
+	    (find-file (mapconcat 'identity file-components "."))))
 
-	(use-package tide
-	    :ensure t
-	    :config
-	    (setq company-tooltip-align-annotations t)
-	    (add-hook 'typescript-mode-hook #'setup-tide-mode)
-	    (add-hook 'js2-mode-hook #'setup-tide-mode))
+	;;; Assumes that Header and Source file are in same directory
+	(defun objc-jump-between-header-source ()
+	  (interactive)
+	  (if (in-template-file)
+	      (jump-to-file-by-extension "ts")
+	    (jump-to-file-by-extension "html")))
 
-	;; (add-hook 'js2-mode-hook #'setup-tide-mode)
-	;; (setq js2-mode-show-parse-errors nil
-	;;       js2-mode-show-strict-warnings nil)
+	;; (defun objc-mode-customizations ()
+	  ;; (define-key objc-mode-map (kbd "C-c t") 'objc-jump-between-header-source))
+(eval-after-load "mhtml-mode"
+  '(progn
+    (define-key html-mode-map (kbd "C-c c") 'objc-jump-between-header-source)
+))
+(eval-after-load "typescript-mode"
+  '(progn
+    (define-key typescript-mode-map (kbd "C-c c") 'objc-jump-between-header-source)
+    (evil-leader/set-key "ee" 'lsp-execute-code-action)
+    (evil-leader/set-key "ef" 'lsp-find-references)
+    (evil-leader/set-key "er" 'lsp-ui-flycheck-list)
+))
 
-	;; (use-package indium
-	    ;; :ensure t)
-	;; (add-hook 'js2-mode-hook #'indium-interaction-mode)
+	;; (add-hook 'objc-mode-hook 'objc-mode-customizations)
 
-	;; (add-hook 'js2-mode-hook #'setup-tide-mode)
-	;; (setq js2-mode-show-parse-errors nil
-	;; 	js2-mode-show-strict-warnings nil)
-  (use-package lsp-mode
-    :hook ((mhtml-mode . lsp) (html-mode . lsp))
-    :commands lsp)
+		;; (use-package js2-mode
+		;;     :ensure t  
+		;;     :mode "\\.js\\'")
+
+	;; 	(defun setup-tide-mode ()
+	;; 	    "Set up Tide mode."
+	;; 	    (interactive)
+	;; 	    (tide-setup)
+	;; 	    (flycheck-mode +1)
+	;; 	    (setq flycheck-check-syntax-automatically '(save-mode-enabled))
+	;; 	    (eldoc-mode +1)
+	;; 	    (tide-hl-identifier-mode +1)
+	;; 	    (company-mode +1)
+	;; 	    ;; (prettier-js-mode)
+	;; 	    (electric-pair-mode)
+	;; 	    (hs-minor-mode))
+
+	;; 	(use-package tide
+	;; 	    :ensure t
+	;; 	    :config
+	;; 	    (progn 
+	;; 	    (setq company-tooltip-align-annotations t)
+	;; 	    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+	;; 	    (add-hook 'js2-mode-hook #'setup-tide-mode)
+	;; 	    ;; (evil-leader/set-key "." 'tide-jump-to-definition)
+	;; 	    ;; (evil-leader/set-key "," 'tide-jump-back)
+	;; )
+	;; )
+
+		;; (add-hook 'js2-mode-hook #'setup-tide-mode)
+		;; (setq js2-mode-show-parse-errors nil
+		;;       js2-mode-show-strict-warnings nil)
+
+		;; (use-package indium
+		    ;; :ensure t)
+		;; (add-hook 'tide-mode-hook 
+		;; 	(progn 
+		;; 	  (evil-leader/set-key "." 'tide-jump-to-definition)
+		;; 	))
+
+		;; (add-hook 'js2-mode-hook #'setup-tide-mode)
+		;; (setq js2-mode-show-parse-errors nil
+		;; 	js2-mode-show-strict-warnings nil)
+	  (use-package lsp-mode
+	    :hook (
+	    (mhtml-mode . lsp) 
+	    (html-mode . lsp) 
+	    (typescript-mode . lsp)
+            (before-save . lsp-organize-imports))
+	    :commands lsp)
+	    ;; :config
+
+				    ;;(kbd "M-,") 'cider-pop-back)
+		;; (evil-leader/set-key "." 'lsp-find-definition)
+
+    (setq flymake-no-changes-timeout 2)
+
+      ;; (use-package lsp-ui 
+      ;;   :ensure t 
+      ;;   :commands lsp-ui-mode
+      ;;   :config 
+      ;;   (setq 
+      ;;       lsp-ui-sideline-enable t
+      ;; 	lsp-ui-doc-enable nil
+      ;; 	lsp-ui-flycheck-enable t
+      ;; 	lsp-ui-imenu-enable t
+      ;; 	lsp-ui-sideline-ignore-duplicate t))
+
+      (use-package company-lsp 
+	:ensure t 
+	:commands company-lsp
+	:config 
+	(push 'company-lsp company-backends) 
+	(setq company-lsp-async t) 
+	(setq company-lsp-cache-candidates 'auto))
+
+  (use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
+  
+(setenv "TSSERVER_LOG_FILE" "/dev/null")
 
 
-    (use-package prettier-js
-	:ensure t)
 
-    (eval-after-load 'typescript-mode
-	'(progn
-	    (add-hook 'typescript-mode-hook #'add-node-modules-path)
-	    (add-hook 'typescript-mode-hook #'prettier-js-mode)))
 
-  (add-hook 'json-mode-hook 
-    (lambda ()
-      (prettier-js-mode -1)))
+	  (setq lsp-clients-angular-language-server-command
+	    '("node"
+		"/home/konstantin/.nvm/versions/node/v10.17.0/lib/node_modules/@angular/language-server"
+		"--ngProbeLocations"
+		"/home/konstantin/.nvm/versions/node/v10.17.0/lib/node_modules"
+		"--tsProbeLocations"
+		"/home/konstantin/.nvm/versions/node/v10.17.0/lib/node_modules"
+		"--stdio"))
+
+
+	    (use-package prettier-js
+		:ensure t)
+
+	    (eval-after-load 'typescript-mode
+		'(progn
+		    (add-hook 'typescript-mode-hook #'add-node-modules-path)
+		    (add-hook 'typescript-mode-hook #'prettier-js-mode)))
+
+	  (add-hook 'json-mode-hook 
+	    (lambda ()
+	      (prettier-js-mode -1)))
 
 
 
@@ -1296,3 +1393,4 @@
                           (set-window-buffer nil (current-buffer)))))
 
 #+END_SRC
+
