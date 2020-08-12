@@ -553,7 +553,7 @@
   ;; disabl in help mode
     (global-unset-key (kbd "C-h"))
     (global-set-key (kbd "C-h") 'evil-window-left)
-  
+
     (global-unset-key (kbd "C-l"))
     (global-set-key (kbd "C-l") 'evil-window-right)
 
@@ -588,6 +588,7 @@
 			"gs" 'magit-status
 			"gn" 'git-gutter:next-hunk
 			"gp" 'git-gutter:previous-hunk
+			"ga" 'smerge-keep-all
 			)))
 	    (evil-mode))
 
@@ -665,17 +666,17 @@
     (define-key evil-insert-state-map (kbd "M-h") 'evil-normal-state)
 
     (define-key dired-mode-map (kbd "n") 'evil-search-next)
-  
+
     (define-key evil-normal-state-map (kbd "{") 'scroll-down)
     (define-key evil-normal-state-map (kbd "}") 'scroll-up)
-    
-    
-    (with-eval-after-load 'evil
-      (define-key evil-motion-state-map (kbd "RET") nil)
-      (define-key xref--xref-buffer-mode-map (kbd "RET") 'xref-goto-xref)
-	    )
 
-    
+
+    ;; (with-eval-after-load 'evil
+    ;; (define-key evil-motion-state-map (kbd "RET") nil)
+    ;; (define-key xref--xref-buffer-mode-map (kbd "RET") 'xref-goto-xref)
+    ;; )
+
+
     ;; swap lines
   ;;   (defun move-line-up ()
   ;;   "Move up the current line."
@@ -1041,6 +1042,9 @@
 		;; (setq js2-mode-show-parse-errors nil
 		;; 	js2-mode-show-strict-warnings nil)
 	  (use-package lsp-mode
+	    :init
+	    (setq lsp-ui-doc-enable nil)
+
 	    :hook (
 	    (mhtml-mode . lsp) 
 	    (html-mode . lsp) 
@@ -1441,5 +1445,12 @@
  '(ediff-window-setup-function 'ediff-setup-windows-plain)
  '(ediff-diff-options "-w")
  '(ediff-split-window-function 'split-window-horizontally))
+
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+
+(setq ediff-combination-pattern '("" A "" B "" Ancestor))
 
 #+END_SRC
