@@ -1,5 +1,7 @@
 * Initializing
 #+BEGIN_SRC emacs-lisp
+
+	(setq desktop-save-mode nil)
     ;; (setq max-lisp-eval-depth 20200)
     ;; (setq max-specpdl-size 3000)
 
@@ -45,6 +47,8 @@
 
 (cua-mode t)
 
+(setq enable-recursive-minibuffers 1)
+
   #+END_SRC
 
 ** Autosave
@@ -66,6 +70,8 @@
 * Font
 
 #+BEGIN_SRC emacs-lisp
+
+(set-face-attribute 'default nil :family "Ubuntu Mono" :height 125 :weight 'normal)
 
 (global-font-lock-mode 1)
 
@@ -443,6 +449,9 @@
     ;; (set-window-margins (selected-window) nil nil)
     (set-fringe-mode 0)
     (setq mode-line-format t)
+    
+    (add-hook 'shell-mode-hook 
+	(lambda () (toggle-truncate-lines)))
 
 #+END_SRC
 
@@ -450,35 +459,35 @@
 
 #+BEGIN_SRC emacs-lisp
 
-(set-default 'truncate-lines t)
-(set-default 'word-wrap t)
+  (set-default 'truncate-lines t)
+  (set-default 'word-wrap t)
 
-(use-package rainbow-delimiters
-    :ensure t
-    :config
-    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+  (use-package rainbow-delimiters
+      :ensure t
+      :config
+      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-(use-package editorconfig
-    :ensure t
-    :config
-    (editorconfig-mode 1))
+  (use-package editorconfig
+      :ensure t
+      :config
+      (editorconfig-mode 1))
 
-(setq default-tab-width 2)
+  (setq default-tab-width 2)
 
-(show-paren-mode 2)
+  (show-paren-mode 2)
 
-(use-package autopair
-    :ensure t
-    :diminish autopair-mode
-    :config 
-    (progn 
-      ;; (add-hook 'rust-mode #'(lambda () (autopair-mode)))
-	;; (add-hook 'paredit-mode-hook #'make-turn-off-autopair-mode)
-		    ;;(autopair-global-mode 1)
-		    ))
-;; (autopair-global-mode)
+  (use-package autopair
+      :ensure t
+      :diminish autopair-mode
+      :config 
+      (progn 
+	;; (add-hook 'rust-mode #'(lambda () (autopair-mode)))
+	  ;; (add-hook 'paredit-mode-hook #'make-turn-off-autopair-mode)
+		      ;;(autopair-global-mode 1)
+		      ))
+  (setq autopair-global-mode nil)
 
-(setq indent-tabs-mode nil)
+  (setq indent-tabs-mode nil)
 
 #+END_SRC
 
@@ -501,38 +510,79 @@
 ** Hierarchy
 #+BEGIN_SRC emacs-lisp
 
-(when (require 'dired-sync nil t)
-    (define-key dired-mode-map (kbd "C-c s") 'dired-do-sync))
+  (when (require 'dired-sync nil t)
+      (define-key dired-mode-map (kbd "C-c s") 'dired-do-sync))
 
-(setq dired-auto-revert-buffer t)
+  (setq dired-auto-revert-buffer t)
 
-(setq dired-dwim-target t)
+  (setq dired-dwim-target t)
 
-(setq dired-icon-mode nil)
+  (setq dired-icon-mode nil)
 
-(define-key dired-mode-map (kbd "n") nil)
+  (define-key dired-mode-map (kbd "n") nil)
 
-;; (use-package dired-icon
-;;     :ensure t
-;;     :config
-;;     (progn (add-hook 'dired-mode-hook 'dired-icon-mode)))
+  ;; (use-package dired-icon
+  ;;     :ensure t
+  ;;     :config
+  ;;     (progn (add-hook 'dired-mode-hook 'dired-icon-mode)))
 
-(use-package ivy
-    :ensure t
-    :config
-    (progn
-    (with-eval-after-load 'ido)
-    (ido-mode -1)
-    (ivy-mode 1)))
+  (use-package ivy
+      :ensure t
+      :config
+      (progn
+      (with-eval-after-load 'ido)
+      (ido-mode -1)
+      (ivy-mode 1)))
 
-(use-package ag
-    :ensure t)
+    ;; (use-package ivy-posframe
+    ;;     :ensure t
+    ;;     :diminish ivy-posframe-mode
+    ;;     :custom-face
+    ;;     (ivy-posframe ((t (:background "#000000"))))
+    ;;     (ivy-posframe-border ((t (:background "#E552F7"))))
+    ;;     (ivy-posframe-cursor ((t (:background "#E552F7"))))
+    ;;     :hook
+    ;;     (ivy-mode . ivy-posframe-mode)
+    ;;     :config
+    ;;     (setq ivy-posframe-parameters
+    ;; 		      '((left-fringe . 2)
+    ;; 			(right-fringe . 2)
+    ;; 			(internal-border-width . 2)
+    ;; 			))
+    ;;     ;; custom define height of post frame per function
+    ;;     (setq ivy-posframe-height-alist '((swiper . 15)
+    ;; 					(find-file . 20)
+    ;; 					(counsel-ag . 15)
+    ;; 					(counsel-projectile-ag . 30)
+    ;; 					(t      . 25)))
 
-(use-package projectile
-    :ensure t
-    :config (projectile-global-mode)
-    (setq projectile-enable-config t)
-    (setq projectile-completion-system 'ivy))
+    ;; 					(setq ivy-display-function #'ivy-posframe-display-at-frame-center)
+    ;;     ;; display at `ivy-posframe-style'
+    ;;     (setq ivy-posframe-display-functions-alist
+    ;; 	    '((swiper          . ivy-posframe-display-at-window-center)
+    ;; 	      (complete-symbol . ivy-posframe-display-at-point)
+    ;; 	      ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+    ;; 	      (counsel-M-x     . ivy-posframe-display-at-frame-center)
+    ;; 	      (t               . ivy-posframe-display-at-frame-center)))
+    ;;     (ivy-posframe-mode 1)
+    ;;     )
+
+    ;; (use-package ivy-rich
+    ;;   :ensure t
+    ;;   :after ivy
+    ;;   :config
+    ;;   (ivy-rich-mode 1))
+
+
+
+  (use-package ag
+      :ensure t)
+
+  (use-package projectile
+      :ensure t
+      :config (projectile-global-mode)
+      (setq projectile-enable-config t)
+      (setq projectile-completion-system 'ivy))
 
 
 #+END_SRC
@@ -550,123 +600,158 @@
 ** Evil
 
 #+BEGIN_SRC emacs-lisp
-;; disabl in help mode
-  (global-unset-key (kbd "C-h"))
-  (global-set-key (kbd "C-h") 'evil-window-left)
-  
-  (global-unset-key (kbd "C-l"))
-  (global-set-key (kbd "C-l") 'evil-window-right)
+  ;; disabl in help mode
+    (global-unset-key (kbd "C-h"))
+    (global-set-key (kbd "C-h") 'evil-window-left)
+
+    (global-unset-key (kbd "C-l"))
+    (global-set-key (kbd "C-l") 'evil-window-right)
 
 
-  (use-package evil 
-      :ensure t
-      :init
-      (progn
-	  (setq evil-default-cursor t)
+    (use-package evil 
+	:ensure t
+	:init
+	(progn
+	    (setq evil-default-cursor t)
 
-	  (use-package evil-leader
-	      :ensure t
-	      :init (global-evil-leader-mode t)
-	      :config
-	      (progn
-		  (setq evil-leader/in-all-states t)
-		  (setq evil-leader/leader "SPC")
+	    (use-package evil-leader
+		:ensure t
+		:init (global-evil-leader-mode t)
+		:config
+		(progn
+		    (setq evil-leader/in-all-states t)
+		    (setq evil-leader/leader "SPC")
 
-		  (evil-leader/set-key
-		      "u" 'switch-to-buffer
-		      ;; "u" 'browse-url
-		      "h" 'ace-jump-char-mode
-		      "s" 'find-file
-		      "b" 'previous-buffer
-		      "mm" 'ibuffer
-		      "m/" 'ibuffer-filter-by-filename
-		      "ma" 'ibuffer-filter-disable
-		      "f" 'projectile-find-file
-		      "ts" 'projectile-ag
-		      "rb" 'revert-buffer
-		      "tr" 'google-translate-query-translate
-		      "gs" 'magit-status
-		      )))
-	  (evil-mode))
+		    (evil-leader/set-key
+			"u" 'switch-to-buffer
+			;; "u" 'browse-url
+			"h" 'ace-jump-char-mode
+			"s" 'find-file
+			"b" 'previous-buffer
+			"mm" 'ibuffer
+			"m/" 'ibuffer-filter-by-filename
+			"ma" 'ibuffer-filter-disable
+			"p" 'projectile-switch-project
+			"f" 'projectile-find-file
+			"ts" 'projectile-ag
+			"rb" 'revert-buffer
+			"tr" 'google-translate-query-translate
+			"gs" 'magit-status
+			"gn" 'git-gutter:next-hunk
+			"gp" 'git-gutter:previous-hunk
+			"ga" 'smerge-keep-all
+			)))
+	    (evil-mode))
 
-      (use-package evil-surround
-	  :ensure t
-	  :config
-	  (global-evil-surround-mode 1))
+	(use-package evil-surround
+	    :ensure t
+	    :config
+	    (global-evil-surround-mode 1))
 
-      (use-package evil-commentary
-	  :ensure t
-	  :bind (:map evil-normal-state-map ("M-/" . evil-commentary)))
-	      ;; ("gc" . evil-commentary)))
+	(use-package evil-commentary
+	    :ensure t
+	    :bind (:map evil-normal-state-map ("M-/" . evil-commentary)))
+		;; ("gc" . evil-commentary)))
 
-      :config
-      (progn
-	  ;; (define-key evil-insert-state-map (kbd "j") 'bw-evil-escape-if-next-char-is-j)
-	  (setq evil-search-module 'evil-search)
-	  (setq evil-shift-width 2)
-	  (evil-add-to-alist
-	      'evil-surround-pairs-alist
-	      ?\( '("(" . ")")
-	      ?\[ '("[" . "]")
-	      ?\{ '("{" . "}")
-	      ?\) '("( " . " )")
-	      ?\] '("[ " . " ]")
-	      ?\} '("{ " . " }"))))
+	:config
+	(progn
+	    ;; (define-key evil-insert-state-map (kbd "j") 'bw-evil-escape-if-next-char-is-j)
+	    (setq evil-search-module 'evil-search)
+	    (setq evil-shift-width 2)
+	    (evil-add-to-alist
+		'evil-surround-pairs-alist
+		?\( '("(" . ")")
+		?\[ '("[" . "]")
+		?\{ '("{" . "}")
+		?\) '("( " . " )")
+		?\] '("[ " . " ]")
+		?\} '("{ " . " }"))))
 
-   (use-package evil-mc
-      :ensure t
-      ;; :commands (evil-mc-make-cursor-here evil-mc-pause-cursors evil-mc-undo-all-cursors)
-      ;; :init (global-evil-mc-mode t)
+     (use-package evil-mc
+	:ensure t
+	;; :commands (evil-mc-make-cursor-here evil-mc-pause-cursors evil-mc-undo-all-cursors)
+	;; :init (global-evil-mc-mode t)
 
-      ;; :bind (:map evil-mc-key-map
-	      ;; ("M-p" . nil)
-	      ;; )
-      :config
-      (global-evil-mc-mode +1)
-      )
+	;; :bind (:map evil-mc-key-map
+		;; ("M-p" . nil)
+		;; )
+	:config
+	(global-evil-mc-mode +1)
+	)
 
-  ;; (define-key evil-mc-key-map (kbd "M-p") nil)
+    ;; (define-key evil-mc-key-map (kbd "M-p") nil)
 
-  (with-eval-after-load 'evil
-      (defalias #'forward-evil-word #'forward-evil-symbol))
+    (with-eval-after-load 'evil
+	(defalias #'forward-evil-word #'forward-evil-symbol))
 
-  (setq evil-emacs-state-modes (delq 'ibuffer-mode evil-emacs-state-modes))
+    (setq evil-emacs-state-modes (delq 'ibuffer-mode evil-emacs-state-modes))
 
-  (define-key evil-normal-state-map (kbd "M-.") nil)
-  (define-key evil-insert-state-map (kbd "M-.") nil)
+    (define-key evil-normal-state-map (kbd "M-.") nil)
+    (define-key evil-insert-state-map (kbd "M-.") nil)
 
-  (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-  (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+    (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
+    (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
+    (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
+    (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
 
-  (define-key evil-normal-state-map (kbd "C-!") 'split-window-horizontally)
-  (define-key evil-normal-state-map (kbd "C-#") 'split-window-vertically)
-  (define-key evil-normal-state-map (kbd "C-@") 'other-frame)
-;;  (define-key evil-normal-state-map (kbd "C-/") 'next-multiframe-window)
+    (define-key evil-normal-state-map (kbd "C-!") 'split-window-horizontally)
+    (define-key evil-normal-state-map (kbd "C-#") 'split-window-vertically)
+    (define-key evil-normal-state-map (kbd "C-@") 'other-frame)
+  ;;  (define-key evil-normal-state-map (kbd "C-/") 'next-multiframe-window)
 
-  (global-unset-key "\M-h")
-  (define-key evil-normal-state-map (kbd "M-h") 'previous-buffer)
+    (global-unset-key "\M-h")
+    (define-key evil-normal-state-map (kbd "M-h") 'previous-buffer)
 
-  (define-key evil-normal-state-map (kbd "&") (kbd "v%"))
+    (define-key evil-normal-state-map (kbd "&") (kbd "v%"))
 
 
-  ;; (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
-  (define-key evil-normal-state-map (kbd "TAB") 'hs-toggle-hiding)
+    ;; (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
+    (define-key evil-normal-state-map (kbd "TAB") 'hs-toggle-hiding)
 
-  (define-key evil-normal-state-map (kbd "C-n") 'evil-search-next)
+    (define-key evil-normal-state-map (kbd "C-n") 'evil-search-next)
 
-  (define-key evil-normal-state-map (kbd "M-v") 'evil-paste-before)
-  (define-key evil-insert-state-map (kbd "M-v") 'evil-paste-before)
-  (define-key evil-normal-state-map (kbd "M-s") 'save-buffer)
+    (define-key evil-normal-state-map (kbd "M-v") 'evil-paste-before)
+    (define-key evil-insert-state-map (kbd "M-v") 'evil-paste-before)
+    (define-key evil-normal-state-map (kbd "M-s") 'save-buffer)
 
-  (define-key evil-insert-state-map (kbd "M-h") 'evil-normal-state)
+    (define-key evil-insert-state-map (kbd "M-h") 'evil-normal-state)
 
-  (define-key dired-mode-map (kbd "n") 'evil-search-next)
-  
-  (define-key evil-normal-state-map (kbd "{") 'scroll-down)
-  (define-key evil-normal-state-map (kbd "}") 'scroll-up)
+    (define-key dired-mode-map (kbd "n") 'evil-search-next)
 
+    (define-key evil-normal-state-map (kbd "{") 'scroll-down)
+    (define-key evil-normal-state-map (kbd "}") 'scroll-up)
+
+
+    ;; (with-eval-after-load 'evil
+    ;; (define-key evil-motion-state-map (kbd "RET") nil)
+    ;; (define-key xref--xref-buffer-mode-map (kbd "RET") 'xref-goto-xref)
+    ;; )
+
+
+    ;; swap lines
+  ;;   (defun move-line-up ()
+  ;;   "Move up the current line."
+  ;;   (interactive)
+  ;;   (transpose-lines 1)
+  ;;   (forward-line -2)
+  ;;   (indent-according-to-mode))
+
+  ;; (defun move-line-down ()
+  ;;   "Move down the current line."
+  ;;   (interactive)
+  ;;   (forward-line 1)
+  ;;   (transpose-lines 1)
+  ;;   (forward-line -1)
+  ;;   (indent-according-to-mode))
+
+  ;;   (global-unset-key (kbd "M-n"))
+  ;;   (global-unset-key (kbd "M-p"))
+
+  ;;   (define-key evil-normal-state-map (kbd "M-n") nil)
+  ;;   (define-key evil-normal-state-map (kbd "M-p") nil)
+
+  ;;   (define-key evil-normal-state-map (kbd "M-n") 'move-line-down)
+  ;;   (define-key evil-normal-state-map (kbd "M-p") 'move-line-up)
 
 #+END_SRC
 
@@ -885,11 +970,11 @@
 
 #+BEGIN_SRC emacs-lisp
 
-(use-package magit
-    :ensure t)
+  (use-package magit
+      :ensure t)
 
-(use-package evil-magit
-    :ensure t)
+  ;; (use-package evil-magit
+  ;;     :ensure t)
 
 #+END_SRC
 
@@ -929,145 +1014,157 @@
 
 #+BEGIN_SRC emacs-lisp
 
-	(defun in-template-file ()
-	  (let* ((filename (buffer-file-name))
-		 (extension (car (last (split-string filename "\\.")))))
-	    (string= "html" extension)))
+	  (defun in-template-file ()
+	    (let* ((filename (buffer-file-name))
+		   (extension (car (last (split-string filename "\\.")))))
+	      (string= "html" extension)))
 
-	(defun jump-to-file-by-extension (extension)
-	  (let* ((filename (buffer-file-name))
-		 (file-components (append (butlast (split-string filename
-								 "\\."))
-					  (list extension))))
-	    (find-file (mapconcat 'identity file-components "."))))
+	  (defun jump-to-file-by-extension (extension)
+	    (let* ((filename (buffer-file-name))
+		   (file-components (append (butlast (split-string filename
+								   "\\."))
+					    (list extension))))
+	      (find-file (mapconcat 'identity file-components "."))))
 
-	;;; Assumes that Header and Source file are in same directory
-	(defun objc-jump-between-header-source ()
-	  (interactive)
-	  (if (in-template-file)
-	      (jump-to-file-by-extension "ts")
-	    (jump-to-file-by-extension "html")))
+	  ;;; Assumes that Header and Source file are in same directory
+	  (defun objc-jump-between-header-source ()
+	    (interactive)
+	    (if (in-template-file)
+		(jump-to-file-by-extension "ts")
+	      (jump-to-file-by-extension "html")))
 
-	;; (defun objc-mode-customizations ()
-	  ;; (define-key objc-mode-map (kbd "C-c t") 'objc-jump-between-header-source))
-(eval-after-load "mhtml-mode"
-  '(progn
-    (define-key html-mode-map (kbd "C-c c") 'objc-jump-between-header-source)
-))
-(eval-after-load "typescript-mode"
-  '(progn
-    (define-key typescript-mode-map (kbd "C-c c") 'objc-jump-between-header-source)
-    (evil-leader/set-key "ee" 'lsp-execute-code-action)
-    (evil-leader/set-key "ef" 'lsp-find-references)
-    (evil-leader/set-key "er" 'lsp-ui-flycheck-list)
-))
-
-	;; (add-hook 'objc-mode-hook 'objc-mode-customizations)
-
-		;; (use-package js2-mode
-		;;     :ensure t  
-		;;     :mode "\\.js\\'")
-
-	;; 	(defun setup-tide-mode ()
-	;; 	    "Set up Tide mode."
-	;; 	    (interactive)
-	;; 	    (tide-setup)
-	;; 	    (flycheck-mode +1)
-	;; 	    (setq flycheck-check-syntax-automatically '(save-mode-enabled))
-	;; 	    (eldoc-mode +1)
-	;; 	    (tide-hl-identifier-mode +1)
-	;; 	    (company-mode +1)
-	;; 	    ;; (prettier-js-mode)
-	;; 	    (electric-pair-mode)
-	;; 	    (hs-minor-mode))
-
-	;; 	(use-package tide
-	;; 	    :ensure t
-	;; 	    :config
-	;; 	    (progn 
-	;; 	    (setq company-tooltip-align-annotations t)
-	;; 	    (add-hook 'typescript-mode-hook #'setup-tide-mode)
-	;; 	    (add-hook 'js2-mode-hook #'setup-tide-mode)
-	;; 	    ;; (evil-leader/set-key "." 'tide-jump-to-definition)
-	;; 	    ;; (evil-leader/set-key "," 'tide-jump-back)
-	;; )
-	;; )
-
-		;; (add-hook 'js2-mode-hook #'setup-tide-mode)
-		;; (setq js2-mode-show-parse-errors nil
-		;;       js2-mode-show-strict-warnings nil)
-
-		;; (use-package indium
-		    ;; :ensure t)
-		;; (add-hook 'tide-mode-hook 
-		;; 	(progn 
-		;; 	  (evil-leader/set-key "." 'tide-jump-to-definition)
-		;; 	))
-
-		;; (add-hook 'js2-mode-hook #'setup-tide-mode)
-		;; (setq js2-mode-show-parse-errors nil
-		;; 	js2-mode-show-strict-warnings nil)
-	  (use-package lsp-mode
-	    :hook (
-	    (mhtml-mode . lsp) 
-	    (html-mode . lsp) 
-	    (typescript-mode . lsp)
-            (before-save . lsp-organize-imports))
-	    :commands lsp)
-	    ;; :config
-
-				    ;;(kbd "M-,") 'cider-pop-back)
-		;; (evil-leader/set-key "." 'lsp-find-definition)
-
-    (setq flymake-no-changes-timeout 2)
-
-      ;; (use-package lsp-ui 
-      ;;   :ensure t 
-      ;;   :commands lsp-ui-mode
-      ;;   :config 
-      ;;   (setq 
-      ;;       lsp-ui-sideline-enable t
-      ;; 	lsp-ui-doc-enable nil
-      ;; 	lsp-ui-flycheck-enable t
-      ;; 	lsp-ui-imenu-enable t
-      ;; 	lsp-ui-sideline-ignore-duplicate t))
-
-      (use-package company-lsp 
-	:ensure t 
-	:commands company-lsp
-	:config 
-	(push 'company-lsp company-backends) 
-	(setq company-lsp-async t) 
-	(setq company-lsp-cache-candidates 'auto))
-
-  (use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
-  
-(setenv "TSSERVER_LOG_FILE" "/dev/null")
+	  ;; (defun objc-mode-customizations ()
+	    ;; (define-key objc-mode-map (kbd "C-c t") 'objc-jump-between-header-source))
+  (eval-after-load "mhtml-mode"
+    '(progn
+      (define-key html-mode-map (kbd "C-c c") 'objc-jump-between-header-source)
+  ))
+  (eval-after-load "typescript-mode"
+    '(progn
+      (define-key typescript-mode-map (kbd "C-c c") 'objc-jump-between-header-source)
+      (evil-leader/set-key "ee" 'lsp-execute-code-action)
+      (evil-leader/set-key "ef" 'lsp-find-references)
+      (evil-leader/set-key "er" 'lsp-ui-flycheck-list)
+  ))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
 
 
+	  ;; (add-hook 'objc-mode-hook 'objc-mode-customizations)
+
+		  ;; (use-package js2-mode
+		  ;;     :ensure t  
+		  ;;     :mode "\\.js\\'")
+
+	  ;; 	(defun setup-tide-mode ()
+	  ;; 	    "Set up Tide mode."
+	  ;; 	    (interactive)
+	  ;; 	    (tide-setup)
+	  ;; 	    (flycheck-mode +1)
+	  ;; 	    (setq flycheck-check-syntax-automatically '(save-mode-enabled))
+	  ;; 	    (eldoc-mode +1)
+	  ;; 	    (tide-hl-identifier-mode +1)
+	  ;; 	    (company-mode +1)
+	  ;; 	    ;; (prettier-js-mode)
+	  ;; 	    (electric-pair-mode)
+	  ;; 	    (hs-minor-mode))
+
+	  ;; 	(use-package tide
+	  ;; 	    :ensure t
+	  ;; 	    :config
+	  ;; 	    (progn 
+	  ;; 	    (setq company-tooltip-align-annotations t)
+	  ;; 	    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+	  ;; 	    (add-hook 'js2-mode-hook #'setup-tide-mode)
+	  ;; 	    ;; (evil-leader/set-key "." 'tide-jump-to-definition)
+	  ;; 	    ;; (evil-leader/set-key "," 'tide-jump-back)
+	  ;; )
+	  ;; )
+
+		  ;; (add-hook 'js2-mode-hook #'setup-tide-mode)
+		  ;; (setq js2-mode-show-parse-errors nil
+		  ;;       js2-mode-show-strict-warnings nil)
+
+		  ;; (use-package indium
+		      ;; :ensure t)
+		  ;; (add-hook 'tide-mode-hook 
+		  ;; 	(progn 
+		  ;; 	  (evil-leader/set-key "." 'tide-jump-to-definition)
+		  ;; 	))
+
+		  ;; (add-hook 'js2-mode-hook #'setup-tide-mode)
+		  ;; (setq js2-mode-show-parse-errors nil
+		  ;; 	js2-mode-show-strict-warnings nil)
+	    (use-package lsp-mode
+	      :init
+	      (setq lsp-ui-doc-enable nil)
+	      (setq lsp-enable-on-type-formatting nil)
+	      (setq lsp-before-save-edits nil)
+
+	      :hook (
+	      (mhtml-mode . lsp) 
+	      (html-mode . lsp) 
+	      (typescript-mode . lsp)
+	      (rust-mode . lsp)
+	      (dart-mode . lsp)
+	      ;; (go-mode . lsp-deferred)
+	      (go-mode . lsp)
+	      ;; (before-save . lsp-organize-imports)
+	      )
+	      :commands (lsp lsp-deferred))
+	      ;; :config
+
+				      ;;(kbd "M-,") 'cider-pop-back)
+		  ;; (evil-leader/set-key "." 'lsp-find-definition)
+
+      (setq flymake-no-changes-timeout 2)
+
+	;; (use-package lsp-ui 
+	;;   :ensure t 
+	;;   :commands lsp-ui-mode
+	;;   :config 
+	;;   (setq 
+	;;       lsp-ui-sideline-enable t
+	;; 	lsp-ui-doc-enable nil
+	;; 	lsp-ui-flycheck-enable t
+	;; 	lsp-ui-imenu-enable t
+	;; 	lsp-ui-sideline-ignore-duplicate t))
+
+	;; (use-package company-lsp 
+	;; 	:ensure t 
+	;; 	:commands company-lsp
+	;; 	:config 
+	;; 	(push 'company-lsp company-backends) 
+	;; 	(setq company-lsp-async t) 
+	;; 	(setq company-lsp-cache-candidates 'auto))
+
+    (use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
+
+  (setenv "TSSERVER_LOG_FILE" "/dev/null")
 
 
-	  (setq lsp-clients-angular-language-server-command
-	    '("node"
-		"/home/konstantin/.nvm/versions/node/v10.17.0/lib/node_modules/@angular/language-server"
-		"--ngProbeLocations"
-		"/home/konstantin/.nvm/versions/node/v10.17.0/lib/node_modules"
-		"--tsProbeLocations"
-		"/home/konstantin/.nvm/versions/node/v10.17.0/lib/node_modules"
-		"--stdio"))
 
 
-	    (use-package prettier-js
-		:ensure t)
+	    (setq lsp-clients-angular-language-server-command
+	      '("node"
+		  "/home/konstantin/.nvm/versions/node/v10.23.0/lib/node_modules/@angular/language-server"
+		  "--ngProbeLocations"
+		  "/home/konstantin/.nvm/versions/node/v10.23.0/lib/node_modules"
+		  "--tsProbeLocations"
+		  "/home/konstantin/.nvm/versions/node/v10.23.0/lib/node_modules"
+		  "--stdio"))
 
-	    (eval-after-load 'typescript-mode
-		'(progn
-		    (add-hook 'typescript-mode-hook #'add-node-modules-path)
-		    (add-hook 'typescript-mode-hook #'prettier-js-mode)))
 
-	  (add-hook 'json-mode-hook 
-	    (lambda ()
-	      (prettier-js-mode -1)))
+	      (use-package prettier-js
+		  :ensure t)
+
+	      (eval-after-load 'typescript-mode
+		  '(progn
+		      (add-hook 'typescript-mode-hook #'add-node-modules-path)
+		      (add-hook 'typescript-mode-hook #'prettier-js-mode)))
+
+	    (add-hook 'json-mode-hook 
+	      (lambda ()
+		(prettier-js-mode -1)))
 
 
 
@@ -1078,78 +1175,93 @@
 
 #+BEGIN_SRC emacs-lisp
 
-  ;; (use-package lsp-mode
-  ;;   :ensure t
-  ;;   :init
-  ;;   (add-hook 'prog-major-mode #'lsp-prog-major-mode-enable)
-  ;;   ;; (lsp-ui-mode nil)
-  ;;   ;; (flymake-mode nil)
-  ;;   :config
-  ;;   ;; (setq lsp-response-timeout 25)
-  ;;   (setq lsp-auto-configure t)
-  ;;   (setq lsp-prefer-flymake nil)
-  ;;   )
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
+  (setq lsp-prefer-capf t)
+  (setq lsp-idle-delay 0.500)
+  (setq flycheck-checker-error-threshold 5000)
 
 
-  ;; (use-package lsp-ui
-  ;; 	 :ensure t
-  ;; 	 :init
-  ;; 	 (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-  ;; 	 :config
-  ;; 	 ;; (setq lsp-ui-sideline-enable t
-  ;; 	 ;; 	  lsp-ui-sideline-show-symbol t
-  ;; 	 ;; 	  lsp-ui-sideline-show-hover t
-  ;; 	 ;; 	  lsp-ui-sideline-show-code-actions t
-  ;; 	 ;; 	  lsp-ui-sideline-update-mode 'point)
-  ;; 	 (setq lsp-ui-doc-enable nil
-  ;; 	   lsp-ui-peek-enable nil
-  ;; 	   lsp-ui-sideline-enable nil
-  ;; 	   lsp-ui-imenu-enable nil
-  ;; 	   ;; lsp-ui-flycheck-enable nil
-  ;; 	   ))
+    ;; (use-package lsp-mode
+    ;;   :ensure t
+    ;;   :init
+    ;;   (add-hook 'prog-major-mode #'lsp-prog-major-mode-enable)
+    ;;   ;; (lsp-ui-mode nil)
+    ;;   ;; (flymake-mode nil)
+    ;;   :config
+    ;;   ;; (setq lsp-response-timeout 25)
+    ;;   (setq lsp-auto-configure t)
+    ;;   (setq lsp-prefer-flymake nil)
+    ;;   )
 
 
-  ;; (require 'lsp)
-  ;; (require 'lsp-clients)
-  ;; (add-hook 'js-mode-hook #'lsp)
+    ;; (use-package lsp-ui
+    ;; 	 :ensure t
+    ;; 	 :init
+    ;; 	 (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+    ;; 	 :config
+    ;; 	 ;; (setq lsp-ui-sideline-enable t
+    ;; 	 ;; 	  lsp-ui-sideline-show-symbol t
+    ;; 	 ;; 	  lsp-ui-sideline-show-hover t
+    ;; 	 ;; 	  lsp-ui-sideline-show-code-actions t
+    ;; 	 ;; 	  lsp-ui-sideline-update-mode 'point)
+    ;; 	 (setq lsp-ui-doc-enable nil
+    ;; 	   lsp-ui-peek-enable nil
+    ;; 	   lsp-ui-sideline-enable nil
+    ;; 	   lsp-ui-imenu-enable nil
+    ;; 	   ;; lsp-ui-flycheck-enable nil
+    ;; 	   ))
+
+
+    ;; (require 'lsp)
+    ;; (require 'lsp-clients)
+    ;; (add-hook 'js-mode-hook #'lsp)
 
 
 
-  ;; (defcustom lsp-on-change-idle-timer-timeout 0.2
-  ;;   "Timeout to send `textDocument/didChange' notification"
-  ;;   :group 'lsp-mode
-  ;;   :type 'number)
+    ;; (defcustom lsp-on-change-idle-timer-timeout 0.2
+    ;;   "Timeout to send `textDocument/didChange' notification"
+    ;;   :group 'lsp-mode
+    ;;   :type 'number)
 
-  ;; (defvar lsp-on-change-idle-timer-id nil)
+    ;; (defvar lsp-on-change-idle-timer-id nil)
 
-  ;; (defun my-lsp-on-change-timer-advice (orig-func &rest args)
-  ;;   "Add an idle timer to lsp-on-change"
-  ;;   (-some->> lsp-on-change-idle-timer-id (cancel-timer))
-  ;;   (setq lsp-on-change-idle-timer-id
-  ;; 	(run-with-idle-timer lsp-on-change-idle-timer-timeout nil
-  ;; 			     (lambda ()
-  ;; 			       (funcall orig-func (point-min) (point-max) (- (point-max) (point-min)))
-  ;; 			       (setq lsp-on-change-idle-timer-id nil)))))
+    ;; (defun my-lsp-on-change-timer-advice (orig-func &rest args)
+    ;;   "Add an idle timer to lsp-on-change"
+    ;;   (-some->> lsp-on-change-idle-timer-id (cancel-timer))
+    ;;   (setq lsp-on-change-idle-timer-id
+    ;; 	(run-with-idle-timer lsp-on-change-idle-timer-timeout nil
+    ;; 			     (lambda ()
+    ;; 			       (funcall orig-func (point-min) (point-max) (- (point-max) (point-min)))
+    ;; 			       (setq lsp-on-change-idle-timer-id nil)))))
 
-  ;; (advice-add 'lsp-on-change :around 'my-lsp-on-change-timer-advice)
+    ;; (advice-add 'lsp-on-change :around 'my-lsp-on-change-timer-advice)
 
-  ;; (add-hook 'typescript-mode-hook #'lsp)
-  ;; (require 'lsp-javascript-typescript)
-
-
-  ;; (use-package lsp-javascript-typescript
-  ;;   :ensure t
-  ;;   :init
-  ;;   (add-to-list 'js-mode-hook #'lsp-javascript-typescript-enable)
-  ;;   (add-to-list 'typescript-mode-hook #'lsp-javascript-typescript-enable))
+    ;; (add-hook 'typescript-mode-hook #'lsp)
+    ;; (require 'lsp-javascript-typescript)
 
 
-  (use-package eglot
-      :ensure t)
+    ;; (use-package lsp-javascript-typescript
+    ;;   :ensure t
+    ;;   :init
+    ;;   (add-to-list 'js-mode-hook #'lsp-javascript-typescript-enable)
+    ;;   (add-to-list 'typescript-mode-hook #'lsp-javascript-typescript-enable))
 
-  ;; (add-hook 'js-mode-hook 'eglot-ensure)
-  ;; (add-hook 'typescript-mode-hook 'eglot-ensure)
-  ;; (add-hook 'tide 'eglot-ensure)
+
+    (use-package eglot
+	:ensure t)
+
+    ;; (add-hook 'js-mode-hook 'eglot-ensure)
+    ;; (add-hook 'typescript-mode-hook 'eglot-ensure)
+    ;; (add-hook 'tide 'eglot-ensure)
+  
+  ;; (lsp-clients-register-clangd)
+  ;; (add-hook 'c++-mode-hook 'lsp)
+
+  ;; (require 'eglot)
+  ;; (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  ;; (add-hook 'c-mode-hook 'eglot-ensure)
+  ;; (add-hook 'c++-mode-hook 'eglot-ensure)
 
 #+END_SRC
 
@@ -1322,38 +1434,90 @@
 * Rust
 #+BEGIN_SRC emacs-lisp
 
-(use-package rust-mode
-    :ensure t)
+    (use-package rust-mode
+	:ensure t)
 
-(use-package racer
-    :ensure t)
+    (use-package racer
+	:ensure t)
 
-(add-hook 'rust-mode-hook #'racer-mode)
-(add-hook 'racer-mode-hook #'eldoc-mode)
+    ;; (add-hook 'rust-mode-hook #'racer-mode)
+    ;; (remove-hook 'rust-mode-hook 'racer-mode t)
 
-(add-hook 'racer-mode-hook #'company-mode)
-(define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
-(setq company-tooltip-align-annotations t)
-(setq rust-format-on-save t)
+    ;; (add-hook 'rust-mode-hook #'lsp-ui-mode)
 
-(add-hook
-   'rust-mode-hook
-   (lambda ()
-     (setq-local electric-pair-inhibit-predicate
-		 `(lambda (c)
-		    (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))
-     (electric-pair-mode)))
-(add-hook 'rust-mode-hook #'(lambda () (flycheck-mode)))
+    ;; (add-hook 'racer-mode-hook #'eldoc-mode)
+    ;; (remove-hook 'rust-mode-hook #'eldoc-mode t)
 
-(use-package cargo
-    :ensure t)
-(add-hook 'rust-mode-hook #'cargo-minor-mode)
+    ;; (add-hook 'racer-mode-hook #'company-mode)
+    ;; (remove-hook 'rust-mode-hook #'company-mode t)
+    (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
+    (setq company-tooltip-align-annotations t)
+    (setq rust-format-on-save t)
 
-(use-package flycheck-rust
-    :ensure t)
+    (setq lsp-rust-server 'rust-analyzer)
 
-(add-hook 'rust-mode-hook #'flycheck-rust-setup)
+    (setq rustic-lsp-server 'rust-analyzer)
+    (setq rustic-format-on-save t)
 
+    (add-hook
+       'rust-mode-hook
+       (lambda ()
+	 (setq-local electric-pair-inhibit-predicate
+		     `(lambda (c)
+			(if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))
+	 (electric-pair-mode)
+	 (evil-leader/set-key "ee" 'lsp-execute-code-action)
+	 (setq lsp-ui-mode nil)
+	 (setq lsp-rust-analyzer-cargo-watch-command "check")
+	 (setq lsp-rust-analyzer-cargo-watch-enable t)
+	 (setq lsp-rust-analyzer-inlay-hints-mode t)
+	 (setq lsp-rust-analyzer-display-chaining-hints t)
+	 (setq lsp-rust-analyzer-display-parameter-hints t)
+	 (setq lsp-rust-analyzer-server-display-inlay-hints t)
+    ))
+    (add-hook 'rust-mode-hook #'(lambda () (flycheck-mode)))
+
+    (use-package cargo
+	:ensure t)
+    (add-hook 'rust-mode-hook #'cargo-minor-mode)
+
+    (use-package flycheck-rust
+	:ensure t)
+
+    (add-hook 'rust-mode-hook #'flycheck-rust-setup)
+  
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;;;;;;; Debug ;;;;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+#+END_SRC
+
+* Flutter
+
+#+BEGIN_SRC emacs-lisp
+
+  (setq lsp-dart-sdk-dir "/home/konstantin/snap/flutter/common/flutter/bin/cache/dart-sdk")
+  (setq lsp-dart-dap-flutter-hot-reload-on-save t)
+  (setq lsp-dart-flutter-widget-guides nil)
+  (setq lsp-dart-flutter-fringe-colors nil)
+  (setq lsp-dart-flutter-fringe-colors nil)
+  (setq lsp-dart-outline nil)
+  (setq lsp-dart-flutter-outline nil)
+  (setq lsp-dart-closing-labels nil)
+  (setq lsp-dart-main-code-lens nil)
+  (setq lsp-dart-test-code-lens nil)
+  
+(use-package dart-mode
+  :mode ("\\.dart\\'")
+  :hook ((dart-mode . (lambda ()
+                        (add-hook 'lsp-mode-hook
+                                  (lambda ()
+                                    (add-hook 'before-save-hook #'lsp-format-buffer nil t)
+                                    (add-hook 'before-save-hook #'lsp-organize-imports nil t)))
+                        ))
+         )
+  )
 
 #+END_SRC
 
@@ -1361,11 +1525,11 @@
 
 #+BEGIN_SRC emacs-lisp
 
-(use-package google-translate
-    :ensure t
-    :config
-    (setq google-translate-default-source-language "en")
-    (setq google-translate-default-target-language "ru"))
+  ;; (use-package google-translate
+  ;;     :ensure t
+  ;;     :config
+  ;;     (setq google-translate-default-source-language "en")
+  ;;     (setq google-translate-default-target-language "ru"))
     
 #+END_SRC
 * Dash
@@ -1380,17 +1544,45 @@
 * Pomidor
 #+BEGIN_SRC emacs-lisp
 
-(setq alert-default-style 'mode-line)
-(use-package pomidor
-  :ensure t
-  :config (setq pomidor-sound-tick nil
-                pomidor-sound-tack nil)
-  :hook (pomidor-mode . (lambda ()
-                          (display-line-numbers-mode -1) ; Emacs 26.1+
-                          (setq left-fringe-width 0 right-fringe-width 0)
-                          (setq left-margin-width 2 right-margin-width 0)
-                          ;; force fringe update
-                          (set-window-buffer nil (current-buffer)))))
+  (setq alert-default-style 'mode-line)
+  (use-package pomidor
+    :ensure t
+    :config (setq pomidor-sound-tick nil
+		  pomidor-sound-tack nil)
+    :hook (pomidor-mode . (lambda ()
+			    (display-line-numbers-mode -1) ; Emacs 26.1+
+			    (setq left-fringe-width 0 right-fringe-width 0)
+			    (setq left-margin-width 2 right-margin-width 0)
+			    ;; force fringe update
+			    (set-window-buffer nil (current-buffer)))))
+			  
+  ;; (pomodoro-add-to-mode-line)
 
 #+END_SRC
 
+* Ediff
+#+BEGIN_SRC emacs-lisp
+
+(custom-set-variables
+ '(ediff-window-setup-function 'ediff-setup-windows-plain)
+ '(ediff-diff-options "-w")
+ '(ediff-split-window-function 'split-window-horizontally))
+
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+
+(setq ediff-combination-pattern '("" A "" B "" Ancestor))
+
+#+END_SRC
+* GO
+
+  #+BEGIN_SRC emacs-lisp
+
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+#+END_SRC
