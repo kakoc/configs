@@ -1,0 +1,1799 @@
+* Initializing
+#+BEGIN_SRC emacs-lisp
+
+	(setq desktop-save-mode nil)
+    ;; (setq max-lisp-eval-depth 20200)
+    ;; (setq max-specpdl-size 3000)
+
+
+
+      (use-package exec-path-from-shell
+	  :ensure t)
+
+      (when (memq window-system '(mac ns x))
+	  (exec-path-from-shell-initialize))
+
+      (fset 'yes-or-no-p 'y-or-n-p)
+
+      ;; (setq scroll-step 1)
+
+      (setq mac-option-modifier 'super)
+      (setq mac-command-modifier 'meta)
+
+      (setq make-backup-files nil) ; stop creating backup~ files
+      (setq auto-save-default nil) ; stop creating #autosave# files
+      (setq create-lockfiles nil)  
+
+      (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+      (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
+
+      ;; (defun paste-from-x-clipboard()
+      ;; 	(interactive)
+      ;; 	(shell-command
+      ;; 	    (cond
+      ;; 		;; (*cygwin* "getclip")
+      ;; 		;; (*is-a-mac* "pbpaste")
+      ;; 		(t "xsel -ob"))
+      ;; 	    1))
+
+      ;; (defun my/paste-in-minibuffer ()
+      ;; 	(local-set-key (kbd "M-v") 'paste-from-x-clipboard))
+
+      ;; (add-hook 'minibuffer-setup-hook 'my/paste-in-minibuffer)
+
+      (setq auto-window-vscroll nil)
+    
+  (setq scroll-preserve-screen-position 1)
+
+(cua-mode t)
+
+(setq enable-recursive-minibuffers 1)
+
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+
+(setq exec-path (append exec-path '("/Users/konstantin/.nvm/versions/node/v14.18.3/bin")))
+  
+  
+(setq split-width-threshold 99)
+(setq split-height-threshold nil)
+
+(global-auto-revert-mode t)
+
+(use-package ansi-color
+    :ensure t)
+
+(defun my/ansi-colorize-buffer ()
+  (let ((buffer-read-only nil))
+    (ansi-color-apply-on-region (point-min) (point-max))))
+(add-hook 'compilation-filter-hook 'my/ansi-colorize-buffer)
+
+  
+
+  #+END_SRC
+
+** Autosave
+#+BEGIN_SRC emacs-lisp
+
+(desktop-save-mode 1)
+(auto-save-visited-mode 1)
+
+;; (use-package real-auto-save
+;; 	:ensure t
+;; 	:config 
+;; 	(progn
+;; 	    (add-hook 'prog-mode-hook 'real-auto-save-mode)
+;; 	    (add-hook 'org-mode-hook 'real-auto-save-mode))
+;;    	(setq real-auto-save-interval 20))
+
+#+END_SRC
+
+* Font
+
+#+BEGIN_SRC emacs-lisp
+
+(set-face-attribute 'default nil :family "Hack" :height 150 :weight 'normal)
+
+(global-font-lock-mode 1)
+
+(defvar ha/fixed-font-family
+    (cond ((x-list-fonts "PragmataPro Liga") "PragmataPro Liga")
+	  ((x-list-fonts "Hack")            "Hack")
+	  ((x-list-fonts "Source Code Pro")  "Source Code Pro")
+	  ((x-list-fonts "Anonymous Pro")    "Anonymous Pro")
+	  ((x-list-fonts "M+ 1mn")           "M+ 1mn"))
+	  "My fixed width font based on what is installed, `nil' if not defined.")
+
+(defvar ha/variable-font-tuple
+    (cond ((x-list-fonts "PragmataPro Liga") '(:font "PragmataPro Liga"))
+	  ((x-list-fonts "Hack")            '(:font "Hack"))
+	  ((x-list-fonts "Lucida Grande")    '(:font "Lucida Grande"))
+	  ((x-list-fonts "Verdana")          '(:font "Verdana"))
+	  ((x-family-fonts "Sans Serif")     '(:family "Sans Serif"))
+	  (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro.")))
+	  "My variable width font available to org-mode files and whatnot.")
+
+#+END_SRC
+
+** Ligatures   
+
+#+BEGIN_SRC emacs-lisp
+
+  (setq prettify-symbols-unprettify-at-point 'right-edge)
+
+  (defconst pragmatapro-prettify-symbols-alist
+    (mapcar (lambda (s)
+	      `(,(car s)
+		.
+		,(vconcat
+		  (apply 'vconcat
+			 (make-list
+			  (- (length (car s)) 1)
+			  (vector (decode-char 'ucs #X0020) '(Br . Bl))))
+		  (vector (decode-char 'ucs (cadr s))))))
+	    '(
+	      ;; ("[ERROR]"   #XE380)
+	      ;; ("[DEBUG]"   #XE381)
+	      ;; ("[INFO]"    #XE382)
+	      ;; ("[WARN]"    #XE383)
+	      ;; ("[WARNING]" #XE384)
+	      ;; ("[ERR]"     #XE385)
+	      ;; ("[FATAL]"   #XE386)
+	      ;; ("[TRACE]"   #XE387)
+	      ;; ("[FIXME]"   #XE388)
+	      ;; ("[TODO]"    #XE389)
+	      ;; ("[BUG]"     #XE38A)
+	      ;; ("[NOTE]"    #XE38B)
+	      ;; ("[HACK]"    #XE38C)
+	      ;; ("[MARK]"    #XE38D)
+	      ;; ("!!"        #XE900)
+	      ;; ("!="        #XE901)
+	      ;; ("!=="       #XE902)
+	      ;; ("!!!"       #XE903)
+	      ;; ("!≡"        #XE904)
+	      ;; ("!≡≡"       #XE905)
+	      ;; ("!>"        #XE906)
+	      ;; ("!=<"       #XE907)
+	      ;; ("#("        #XE920)
+	      ;; ("#_"        #XE921)
+	      ;; ("#{"        #XE922)
+	      ;; ("#?"        #XE923)
+	      ;; ("#>"        #XE924)
+	      ;; ("##"        #XE925)
+	      ;; ("#_("       #XE926)
+	      ;; ("%="        #XE930)
+	      ;; ("%>"        #XE931)
+	      ;; ("%>%"       #XE932)
+	      ;; ("%<%"       #XE933)
+	      ;; ("&%"        #XE940)
+	      ;; ("&&"        #XE941)
+	      ;; ("&*"        #XE942)
+	      ;; ("&+"        #XE943)
+	      ;; ("&-"        #XE944)
+	      ;; ("&/"        #XE945)
+	      ;; ("&="        #XE946)
+	      ;; ("&&&"       #XE947)
+	      ;; ("&>"        #XE948)
+	      ;; ("$>"        #XE955)
+	      ;; ("***"       #XE960)
+	      ;; ("*="        #XE961)
+	      ;; ("*/"        #XE962)
+	      ;; ("*>"        #XE963)
+	      ;; ("++"        #XE970)
+	      ;; ("+++"       #XE971)
+	      ;; ("+="        #XE972)
+	      ;; ("+>"        #XE973)
+	      ;; ("++="       #XE974)
+	      ;; ("--"        #XE980)
+	      ;; ("-<"        #XE981)
+	      ;; ("-<<"       #XE982)
+	      ;; ("-="        #XE983)
+	      ;; ("->"        #XE984)
+	      ;; ("->>"       #XE985)
+	      ;; ("---"       #XE986)
+	      ;; ("-->"       #XE987)
+	      ;; ("-+-"       #XE988)
+	      ;; ("-\\/"      #XE989)
+	      ;; ("-|>"       #XE98A)
+	      ;; ("-<|"       #XE98B)
+	      ;; (".."        #XE990)
+	      ;; ("..."       #XE991)
+	      ;; ("..<"       #XE992)
+	      ;; (".>"        #XE993)
+	      ;; (".~"        #XE994)
+	      ;; (".="        #XE995)
+	      ;; ("/*"        #XE9A0)
+	      ;; ("//"        #XE9A1)
+	      ;; ("/>"        #XE9A2)
+	      ;; ("/="        #XE9A3)
+	      ;; ("/=="       #XE9A4)
+	      ;; ("///"       #XE9A5)
+	      ;; ("/**"       #XE9A6)
+	      ;; (":::"       #XE9AF)
+	      ;; ("::"        #XE9B0)
+	      ;; (":="        #XE9B1)
+	      ;; (":≡"        #XE9B2)
+	      ;; (":>"        #XE9B3)
+	      ;; (":=>"       #XE9B4)
+	      ;; (":("        #XE9B5)
+	      ;; (":-("       #XE9B6)
+	      ;; (":)"        #XE9B7)
+	      ;; (":-)"       #XE9B8)
+	      ;; (":/"        #XE9B9)
+	      ;; (":\\"       #XE9BA)
+	      ;; (":3"        #XE9BB)
+	      ;; (":D"        #XE9BC)
+	      ;; (":P"        #XE9BD)
+	      ;; (":>:"       #XE9BE)
+	      ;; (":<:"       #XE9BF)
+	      ;; ("<$>"       #XE9C0)
+	      ;; ("<*"        #XE9C1)
+	      ;; ("<*>"       #XE9C2)
+	      ;; ("<+>"       #XE9C3)
+	      ;; ("<-"        #XE9C4)
+	      ;; ("<<"        #XE9C5)
+	      ;; ("<<<"       #XE9C6)
+	      ;; ("<<="       #XE9C7)
+	      ;; ("<="        #XE9C8)
+	      ;; ("<=>"       #XE9C9)
+	      ;; ("<>"        #XE9CA)
+	      ;; ("<|>"       #XE9CB)
+	      ;; ("<<-"       #XE9CC)
+	      ;; ("<|"        #XE9CD)
+	      ;; ("<=<"       #XE9CE)
+	      ;; ("<~"        #XE9CF)
+	      ;; ("<~~"       #XE9D0)
+	      ;; ("<<~"       #XE9D1)
+	      ;; ("<$"        #XE9D2)
+	      ;; ("<+"        #XE9D3)
+	      ;; ("<!>"       #XE9D4)
+	      ;; ("<@>"       #XE9D5)
+	      ;; ("<#>"       #XE9D6)
+	      ;; ("<%>"       #XE9D7)
+	      ;; ("<^>"       #XE9D8)
+	      ;; ("<&>"       #XE9D9)
+	      ;; ("<?>"       #XE9DA)
+	      ;; ("<.>"       #XE9DB)
+	      ;; ("</>"       #XE9DC)
+	      ;; ("<\\>"      #XE9DD)
+	      ;; ("<\">"      #XE9DE)
+	      ;; ("<:>"       #XE9DF)
+	      ;; ("<~>"       #XE9E0)
+	      ;; ("<**>"      #XE9E1)
+	      ;; ("<<^"       #XE9E2)
+	      ;; ("<!"        #XE9E3)
+	      ;; ("<@"        #XE9E4)
+	      ;; ("<#"        #XE9E5)
+	      ;; ("<%"        #XE9E6)
+	      ;; ("<^"        #XE9E7)
+	      ;; ("<&"        #XE9E8)
+	      ;; ("<?"        #XE9E9)
+	      ;; ("<."        #XE9EA)
+	      ;; ("</"        #XE9EB)
+	      ;; ("<\\"       #XE9EC)
+	      ;; ("<\""       #XE9ED)
+	      ;; ("<:"        #XE9EE)
+	      ;; ("<->"       #XE9EF)
+	      ;; ("<!--"      #XE9F0)
+	      ;; ("<--"       #XE9F1)
+	      ;; ("<~<"       #XE9F2)
+	      ;; ("<==>"      #XE9F3)
+	      ;; ("<|-"       #XE9F4)
+	      ;; ("<<|"       #XE9F5)
+	      ;; ("<-<"       #XE9F7)
+	      ;; ("<-->"      #XE9F8)
+	      ;; ("<<=="      #XE9F9)
+	      ;; ("<=="       #XE9FA)
+	      ;; ("==<"       #XEA00)
+	      ;; ("=="        #XEA01)
+	      ;; ("==="       #XEA02)
+	      ;; ("==>"       #XEA03)
+	      ("=>"        #XE890)
+	      ;; ("=~"        #XEA05)
+	      ;; ("=>>"       #XEA06)
+	      ;; ("=/="       #XEA07)
+	      ;; ("=~="       #XEA08)
+	      ;; ("==>>"      #XEA09)
+	      ;; ("≡≡"        #XEA10)
+	      ;; ("≡≡≡"       #XEA11)
+	      ;; ("≡:≡"       #XEA12)
+	      ;; (">-"        #XEA20)
+	      ;; (">="        #XEA21)
+	      ;; (">>"        #XEA22)
+	      ;; (">>-"       #XEA23)
+	      ;; (">=="       #XEA24)
+	      ;; (">>>"       #XEA25)
+	      ;; (">=>"       #XEA26)
+	      ;; (">>^"       #XEA27)
+	      ;; (">>|"       #XEA28)
+	      ;; (">!="       #XEA29)
+	      ;; (">->"       #XEA2A)
+	      ;; ("??"        #XEA40)
+	      ;; ("?~"        #XEA41)
+	      ;; ("?="        #XEA42)
+	      ;; ("?>"        #XEA43)
+	      ;; ("???"       #XEA44)
+	      ;; ("?."        #XEA45)
+	      ;; ("^="        #XEA48)
+	      ;; ("^."        #XEA49)
+	      ;; ("^?"        #XEA4A)
+	      ;; ("^.."       #XEA4B)
+	      ;; ("^<<"       #XEA4C)
+	      ;; ("^>>"       #XEA4D)
+	      ;; ("^>"        #XEA4E)
+	      ;; ("\\\\"      #XEA50)
+	      ;; ("\\>"       #XEA51)
+	      ;; ("\\/-"      #XEA52)
+	      ;; ("@>"        #XEA57)
+	      ;; ("|="        #XEA60)
+	      ;; ("||"        #XEA61)
+	      ;; ("|>"        #XEA62)
+	      ;; ("|||"       #XEA63)
+	      ;; ("|+|"       #XEA64)
+	      ;; ("|->"       #XEA65)
+	      ;; ("|-->"      #XEA66)
+	      ;; ("|=>"       #XEA67)
+	      ;; ("|==>"      #XEA68)
+	      ;; ("|>-"       #XEA69)
+	      ;; ("|<<"       #XEA6A)
+	      ;; ("||>"       #XEA6B)
+	      ;; ("|>>"       #XEA6C)
+	      ;; ("|-"        #XEA6D)
+	      ;; ("||-"       #XEA6E)
+	      ;; ("~="        #XEA70)
+	      ;; ("~>"        #XEA71)
+	      ;; ("~~>"       #XEA72)
+	      ;; ("~>>"       #XEA73)
+	      ;; ("[["        #XEA80)
+	      ;; ("]]"        #XEA81)
+	      ;; ("\">"       #XEA90)
+	      ;; ("_|_"       #XEA97)
+	      )))
+
+  (defun add-pragmatapro-prettify-symbols-alist ()
+    (dolist (alias pragmatapro-prettify-symbols-alist)
+      (push alias prettify-symbols-alist)))
+
+#+END_SRC
+
+* Editor view
+  
+#+BEGIN_SRC emacs-lisp
+
+    (toggle-scroll-bar -1)
+
+    (tool-bar-mode -1)
+    (menu-bar-mode -1)
+
+    (set-frame-parameter nil 'fullscreen 'fullboth)
+
+    ;; hide all
+    (defun my-hide-all()
+    ;;     (interactive)
+	 (hs-minor-mode))
+    ;;     (hs-hide-all))
+
+    (add-hook 'prog-mode-hook 'my-hide-all)
+
+    (setq default-frame-alist '((cursor-color . "#E552F7")))
+
+    (global-hl-line-mode -1)
+
+    (use-package color-theme-sanityinc-tomorrow
+	:ensure t)
+    (color-theme-sanityinc-tomorrow--define-theme night)
+
+    ;; (use-package color-theme
+    ;; 	  :ensure t
+    ;; 	  :init (require 'color-theme)
+    ;; 	  :config (use-package color-theme-sanityinc-tomorrow
+    ;; 		  :ensure t))
+
+    (use-package git-gutter-fringe
+	:ensure t
+	:diminish git-gutter-mode
+	:init (setq git-gutter-fr:side 'left-fringe)
+	:config (global-git-gutter-mode t))
+
+  (setq-default left-fringe-width  1)
+  ;; (setq-default right-fringe-width 3)
+   (set-background-color "#121212")
+
+
+  (fringe-helper-define 'git-gutter-fr:added nil
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX")
+
+  (fringe-helper-define 'git-gutter-fr:deleted nil
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX")
+
+  (fringe-helper-define 'git-gutter-fr:modified nil
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "XXXXXXXX")
+
+    (use-package diff-hl
+	:ensure t
+	:init
+	:config
+	(setq diff-hl-side 'right)
+	(add-hook 'dired-mode-hook 'diff-hl-dired-mode))
+
+    (use-package minions
+	:ensure t
+	:config (minions-mode 1))
+
+    ;; (set-face-background 'vertical-border "#1d1f21")
+    ;; (set-face-foreground 'vertical-border (face-background 'vertical-border))
+    ;; (setq-default left-margin-width 10 right-margin-width 8) ; Define new widths
+    ;; (setq-default left-margin-width 1 right-margin-width 1)
+    ;; (set-window-buffer nil (current-buffer)) ; Use them now.
+    ;; (set-window-margins (selected-window) nil nil)
+    (set-fringe-mode 0)
+    (setq mode-line-format t)
+    
+    (add-hook 'shell-mode-hook 
+	(lambda () (toggle-truncate-lines)))
+
+#+END_SRC
+
+* Code/Text view
+
+#+BEGIN_SRC emacs-lisp
+
+  (set-default 'truncate-lines t)
+  (set-default 'word-wrap t)
+
+  (use-package rainbow-delimiters
+      :ensure t
+      :config
+      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+
+  (use-package editorconfig
+      :ensure t
+      :config
+      (editorconfig-mode 1))
+
+  (setq default-tab-width 2)
+
+  (show-paren-mode 2)
+
+  ;; (use-package autopair
+  ;;     :ensure t
+  ;;     :diminish autopair-mode
+  ;;     :config 
+  ;;     (progn 
+  ;; 	;; (add-hook 'rust-mode #'(lambda () (autopair-mode)))
+  ;; 	  ;; (add-hook 'paredit-mode-hook #'make-turn-off-autopair-mode)
+  ;; 		      ;;(autopair-global-mode 1)
+  ;; 		      ))
+  ;; (setq autopair-global-mode nil)
+
+  (setq indent-tabs-mode nil)
+
+#+END_SRC
+
+* Remote access
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package tramp
+    :ensure t)
+
+#+END_SRC
+
+* Navigation
+
+  #+BEGIN_SRC emacs-lisp
+
+(use-package hyperbole :ensure t)
+  
+  #+END_SRC
+** Hierarchy
+#+BEGIN_SRC emacs-lisp
+
+  (when (require 'dired-sync nil t)
+      (define-key dired-mode-map (kbd "C-c s") 'dired-do-sync))
+
+  (setq dired-auto-revert-buffer t)
+
+  (setq dired-dwim-target t)
+
+  (setq dired-icon-mode nil)
+
+  (define-key dired-mode-map (kbd "n") nil)
+
+  ;; (use-package dired-icon
+  ;;     :ensure t
+  ;;     :config
+  ;;     (progn (add-hook 'dired-mode-hook 'dired-icon-mode)))
+
+  (use-package ivy
+      :ensure t
+      :config
+      (progn
+      (with-eval-after-load 'ido)
+      (ido-mode -1)
+      (ivy-mode 1)))
+
+     (use-package ivy-posframe
+         :ensure t
+         :diminish ivy-posframe-mode
+         :custom-face
+         (ivy-posframe ((t (:background "#000000"))))
+         (ivy-posframe-border ((t (:background "#E552F7"))))
+         (ivy-posframe-cursor ((t (:background "#E552F7"))))
+         :hook
+         (ivy-mode . ivy-posframe-mode)
+         :config
+         (setq ivy-posframe-parameters
+     		      '((left-fringe . 2)
+     			(right-fringe . 2)
+     			(internal-border-width . 2)
+     			))
+         ;; custom define height of post frame per function
+         (setq ivy-posframe-height-alist '((swiper . 15)
+     					(find-file . 20)
+     					(counsel-ag . 15)
+     					(counsel-projectile-ag . 30)
+     					(t      . 25)))
+
+     					(setq ivy-display-function #'ivy-posframe-display-at-frame-center)
+         ;; display at `ivy-posframe-style'
+         (setq ivy-posframe-display-functions-alist
+     	    '((swiper          . ivy-posframe-display-at-window-center)
+     	      (complete-symbol . ivy-posframe-display-at-point)
+     	      ;;(counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+     	      (counsel-M-x     . ivy-posframe-display-at-frame-center)
+     	      (t               . ivy-posframe-display-at-frame-center)))
+         )
+    (ivy-posframe-mode 1)
+
+
+    ;; (use-package ivy-rich
+    ;;   :ensure t
+    ;;   :after ivy
+    ;;   :config
+    ;;   (ivy-rich-mode 1))
+
+
+
+  (use-package ag
+      :ensure t)
+
+  (use-package projectile
+      :ensure t
+      :config (projectile-global-mode)
+      (setq projectile-enable-config t)
+      (setq projectile-completion-system 'ivy))
+
+  (use-package orderless
+    :ensure t
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-overrides '((file (styles basic partial-completion)))))
+
+    (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
+    (add-to-list 'ivy-highlight-functions-alist '(orderless-ivy-re-builder . orderless-ivy-highlight))
+
+
+#+END_SRC
+
+** Code
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package ace-jump-mode
+    :ensure 
+    :bind ("C-c SPC" . ace-jump-mode))
+
+#+END_SRC
+
+** Evil
+
+#+BEGIN_SRC emacs-lisp
+  ;; disabl in help mode
+    (setq evil-want-keybinding nil)
+
+    (global-unset-key (kbd "C-h"))
+    (global-set-key (kbd "C-h") 'evil-window-left)
+
+    (global-unset-key (kbd "C-l"))
+    (global-set-key (kbd "C-l") 'evil-window-right)
+
+
+    (use-package evil 
+	:ensure t
+	:init
+	(progn
+	    (setq evil-default-cursor t)
+	    (setq evil-undo-system 'undo-fu)
+
+	    (use-package evil-leader
+		:ensure t
+		:init (global-evil-leader-mode t)
+		:config
+		(progn
+		    (setq evil-leader/in-all-states t)
+		    (setq evil-leader/leader "SPC")
+
+		    (evil-leader/set-key
+			"u" 'switch-to-buffer
+			;; "u" 'browse-url
+			"h" 'ace-jump-char-mode
+			"s" 'find-file
+			"b" 'previous-buffer
+			"mm" 'ibuffer
+			"m/" 'ibuffer-filter-by-filename
+			"ma" 'ibuffer-filter-disable
+			"p" 'projectile-switch-project
+			"f" 'projectile-find-file
+			"ts" 'projectile-ag
+			"rb" 'revert-buffer
+			"tr" 'google-translate-query-translate
+			"gs" 'magit-status
+			"gn" 'git-gutter:next-hunk
+			"gp" 'git-gutter:previous-hunk
+			"ga" 'smerge-keep-all
+			"gq" 'evil-mc-undo-all-cursors
+			)))
+	    (evil-mode))
+
+	(use-package evil-surround
+	    :ensure t
+	    :config
+	    (global-evil-surround-mode 1))
+
+	(use-package evil-commentary
+	    :ensure t
+	    :bind (:map evil-normal-state-map ("M-/" . evil-commentary)))
+		;; ("gc" . evil-commentary)))
+
+	:config
+	(progn
+	    ;; (define-key evil-insert-state-map (kbd "j") 'bw-evil-escape-if-next-char-is-j)
+	    (setq evil-search-module 'evil-search)
+	    (setq evil-shift-width 2)
+	    (evil-add-to-alist
+		'evil-surround-pairs-alist
+		?\( '("(" . ")")
+		?\[ '("[" . "]")
+		?\{ '("{" . "}")
+		?\) '("( " . " )")
+		?\] '("[ " . " ]")
+		?\} '("{ " . " }"))))
+
+     (use-package evil-mc
+	:ensure t
+	;; :commands (evil-mc-make-cursor-here evil-mc-pause-cursors evil-mc-undo-all-cursors)
+	;; :init (global-evil-mc-mode t)
+
+	;; :bind (:map evil-mc-key-map
+		;; ("M-p" . nil)
+		;; )
+	:config
+	(global-evil-mc-mode)
+	)
+
+    ;; (define-key evil-mc-key-map (kbd "M-p") nil)
+
+    (with-eval-after-load 'evil
+	(defalias #'forward-evil-word #'forward-evil-symbol))
+
+    (setq evil-emacs-state-modes (delq 'ibuffer-mode evil-emacs-state-modes))
+
+    (define-key evil-normal-state-map (kbd "M-.") nil)
+    (define-key evil-insert-state-map (kbd "M-.") nil)
+
+    (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
+    (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
+    (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
+    (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+
+    (define-key evil-normal-state-map (kbd "C-!") 'split-window-horizontally)
+    (define-key evil-normal-state-map (kbd "C-#") 'split-window-vertically)
+    (define-key evil-normal-state-map (kbd "C-@") 'other-frame)
+  ;;  (define-key evil-normal-state-map (kbd "C-/") 'next-multiframe-window)
+
+    (global-unset-key "\M-h")
+    (define-key evil-normal-state-map (kbd "M-h") 'previous-buffer)
+
+    (define-key evil-normal-state-map (kbd "&") (kbd "v%"))
+
+
+    ;; (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
+    (define-key evil-normal-state-map (kbd "TAB") 'hs-toggle-hiding)
+
+    ;; (define-key evil-normal-state-map (kbd "C-n") 'evil-search-next)
+    (define-key evil-normal-state-map (kbd "C-n") nil)
+    (define-key evil-normal-state-map (kbd "C-n") 'evil-mc-make-and-goto-next-match)
+    (define-key evil-normal-state-map (kbd "C-p") 'evil-mc-make-and-goto-prev-match)
+
+    (define-key evil-normal-state-map (kbd "M-v") 'evil-paste-before)
+    (define-key evil-insert-state-map (kbd "M-v") 'evil-paste-before)
+    (define-key evil-normal-state-map (kbd "M-s") 'save-buffer)
+
+    (define-key evil-insert-state-map (kbd "M-h") 'evil-normal-state)
+
+    (define-key dired-mode-map (kbd "n") 'evil-search-next)
+
+    (define-key evil-normal-state-map (kbd "{") 'scroll-down)
+    (define-key evil-normal-state-map (kbd "}") 'scroll-up)
+
+    (setq x-select-enable-clipboard +1)
+    (fset 'evil-visual-update-x-selection 'ignore)
+    (setq evil-kill-on-visual-paste nil)
+
+
+
+    ;; (with-eval-after-load 'evil
+    ;; (define-key evil-motion-state-map (kbd "RET") nil)
+    ;; (define-key xref--xref-buffer-mode-map (kbd "RET") 'xref-goto-xref)
+    ;; )
+
+  (use-package evil-collection
+   :after evil
+   :ensure t
+   :config
+   (setq evil-collection-company-use-tng nil)
+   (evil-collection-init))
+
+    ;; swap lines
+  ;;   (defun move-line-up ()
+  ;;   "Move up the current line."
+  ;;   (interactive)
+  ;;   (transpose-lines 1)
+  ;;   (forward-line -2)
+  ;;   (indent-according-to-mode))
+
+  ;; (defun move-line-down ()
+  ;;   "Move down the current line."
+  ;;   (interactive)
+  ;;   (forward-line 1)
+  ;;   (transpose-lines 1)
+  ;;   (forward-line -1)
+  ;;   (indent-according-to-mode))
+
+  ;;   (global-unset-key (kbd "M-n"))
+  ;;   (global-unset-key (kbd "M-p"))
+
+  ;;   (define-key evil-normal-state-map (kbd "M-n") nil)
+  ;;   (define-key evil-normal-state-map (kbd "M-p") nil)
+
+  ;;   (define-key evil-normal-state-map (kbd "M-n") 'move-line-down)
+  ;;   (define-key evil-normal-state-map (kbd "M-p") 'move-line-up)
+
+#+END_SRC
+
+** iBuffer
+   
+#+BEGIN_SRC emacs-lisp
+
+(setq ibuffer-saved-filter-groups
+    (quote (("default"
+	    ("dired" (mode . dired-mode))
+	    ("TS" (mode . typescript-mode))
+	    ("planner" (or
+			(name . "^\\*Calendar\\*$")
+			(name . "^diary$")
+			(mode . muse-mode)))
+	    ("emacs" (or
+			(name . "^\\*scratch\\*$")
+			(name . "^\\*Messages\\*$")))
+
+	    ("cider" (name . "^\\*cider"))
+	    
+	    ("lsp" (name . "^\\*EGLOT"))
+
+	    ("gnus" (or
+		    (mode . message-mode)
+		    (mode . bbdb-mode)
+		    (mode . mail-mode)
+		    (mode . gnus-group-mode)
+		    (mode . gnus-summary-mode)
+		    (mode . gnus-article-mode)
+		    (name . "^\\.bbdb$")
+		    (name . "^\\.newsrc-dribble")))))))
+
+(add-hook 'ibuffer-mode-hook
+    (lambda ()
+	(ibuffer-switch-to-saved-filter-groups "default")))
+
+#+END_SRC
+
+* Org
+
+#+BEGIN_SRC emacs-lisp
+
+   (require 'ob)
+   (require 'ob-clojure)
+
+   (use-package ob-http
+       :ensure t)
+
+   (org-babel-do-load-languages 'org-babel-load-languages
+       '(
+	   (shell . t)
+	   (js . t)
+	   (clojure . t)
+	   (http . t)))
+
+  (setq org-confirm-babel-evaluate t)
+
+  (use-package org-bullets
+      :ensure t
+      :config (add-hook 'org-mode-hook 'org-bullets-mode))
+
+  (use-package ob-async
+      :ensure t)
+
+  (use-package ob-mongo
+      :ensure t)
+
+  (setq org-src-fontify-natively t)
+  (setq org-hide-emphasis-markers t)
+
+  (add-hook 'org-mode-hook '(lambda () 
+      (visual-line-mode t)))
+
+
+  (defun org-src-color-blocks-light ()
+      "Colors the block headers and footers to make them stand out more for lighter themes"
+      (interactive)
+      (custom-set-faces
+	  '(org-block-begin-line
+	  ((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+	  '(org-block-background
+	      ((t (:background "#FFFFEA"))))
+	  '(org-block
+	      ((t (:background "#FFFFEA"))))
+	  '(org-block-end-line
+	      ((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))))
+
+  (defun org-src-color-blocks-dark ()
+      "Colors the block headers and footers to make them stand out more for dark themes"
+      (interactive)
+      (custom-set-faces
+      '(org-block-begin-line
+	  ((t (:foreground "#008ED1" :background "#002E41"))))
+      '(org-block-background
+	  ((t (:background "#000000"))))
+      '(org-block
+	  ((t (:background "#000000"))))
+      '(org-block-end-line
+	  ((t (:foreground "#008ED1" :background "#002E41"))))))
+
+  ;; -------- babel src
+  (with-eval-after-load 'org
+      (defvar-local rasmus/org-at-src-begin -1
+      "Variable that holds whether last position was a ")
+
+      (defvar rasmus/ob-header-symbol ?☰
+      "Symbol used for babel headers")
+
+      (defun rasmus/org-prettify-symbols ()
+      (mapc (apply-partially 'add-to-list 'prettify-symbols-alist)
+	    (cl-reduce 'append
+			(mapcar (lambda (x) (list x (cons (upcase (car x)) (cdr x))))
+				`(("#+begin_src" . ?✎) ;; ➤ 🖝 ➟ ➤ ✎
+				("#+end_src"   . ?□) ;; ⏹
+				("#+header:" . ,rasmus/ob-header-symbol)
+				("#+begin_quote" . ?»)
+				("#+end_quote" . ?«)))))
+      (turn-on-prettify-symbols-mode))
+      ;; (add-hook 'post-command-hook 'rasmus/org-prettify-src t t))
+      (add-hook 'org-mode-hook #'rasmus/org-prettify-symbols))
+      
+(defun org-summary-todo (n-done n-not-done)
+  "Switch entry to DONE when all subentries are done, to TODO otherwise."
+  (let (org-log-done org-log-states)   ; turn off logging
+    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
+(add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
+
+#+END_SRC
+
+* Theme
+
+#+BEGIN_SRC emacs-lisp
+
+  (defun ha/change-theme (theme org-block-style)
+      "Changes the color scheme and reset the mode line."
+      (funcall theme)
+      (funcall org-block-style)
+      (let* 
+	  ((ha/fixed-font-tuple (list :font ha/fixed-font-family))
+	  (base-font-color     (face-foreground 'default nil 'default))
+	  (background-color    (face-background 'default nil 'default))
+	  (primary-color       (face-foreground 'mode-line nil))
+	  (secondary-color     (face-background 'secondary-selection nil 'region))
+	  (base-height         (face-attribute 'default :height))
+	  (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+
+      (when ha/fixed-font-family
+	  (set-frame-font ha/fixed-font-family)
+	  (set-face-attribute 'default nil :font ha/fixed-font-family :height 130)
+	  (set-face-font 'default ha/fixed-font-family))
+
+      ;; Noticeable?
+      ;; (set-face-attribute 'region nil :background "#ffff50" :foreground "black")
+      ;; Subtle?
+      (set-face-attribute 'region nil :background "#0000bb" :foreground 'unspecified)
+      ;; (set-face-background 'vertical-border "#1d1f21")
+      ;; (set-face-foreground 'vertical-border (face-background 'vertical-border))
+
+
+      (custom-theme-set-faces 'ha/org-theme
+	  `(org-agenda-structure ((t (:inherit default :height 2.0 :underline nil))))
+	  `(org-verbatim ((t (:inherit 'fixed-pitched :foreground "#aef"))))
+	  `(org-table ((t (:inherit 'fixed-pitched))))
+	  `(org-block ((t (:inherit 'fixed-pitched))))
+	  `(org-block-background ((t (:inherit 'fixed-pitched))))
+	  `(org-block-begin-line ((t (:inherit 'fixed-pitched))))
+	  `(org-block-end-line ((t (:inherit 'fixed-pitched))))
+	  `(org-document-title ((t (,@headline ,@ha/variable-font-tuple :height 1.5 :underline nil)))))))
+
+      ;; (custom-theme-set-faces 'ha/org-theme
+      ;;     `(org-agenda-structure ((t (:inherit default :height 2.0 :underline nil))))
+      ;;     `(org-verbatim ((t (:inherit 'fixed-pitched :foreground "#aef"))))
+      ;;     `(org-table ((t (:inherit 'fixed-pitched))))
+      ;;     `(org-block ((t (:inherit 'fixed-pitched))))
+      ;;     `(org-block-background ((t (:inherit 'fixed-pitched))))
+      ;;     `(org-block-begin-line ((t (:inherit 'fixed-pitched))))
+      ;;     `(org-block-end-line ((t (:inherit 'fixed-pitched)))))))
+	  ;; `(org-level-8 ((t (,@headline ,@ha/variable-font-tuple))))
+	  ;; `(org-level-7 ((t (,@headline ,@ha/variable-font-tuple))))
+	  ;; `(org-level-6 ((t (,@headline ,@ha/variable-font-tuple))))
+	  ;; `(org-level-5 ((t (,@headline ,@ha/variable-font-tuple))))
+	  ;; `(org-level-4 ((t (,@headline ,@ha/variable-font-tuple
+	  ;; 				    :height 1.1))))
+	  ;; `(org-level-3 ((t (,@headline ,@ha/variable-font-tuple
+	  ;; 				    :height 1.1))))
+	  ;; `(org-level-2 ((t (,@headline ,@ha/variable-font-tuple
+	  ;; 				    :height 1.1))))
+	  ;; `(org-level-1 ((t (,@headline ,@ha/variable-font-tuple
+	  ;; 				    :height 2.1))))
+	  ;; `(org-document-title ((t (,@headline ,@ha/variable-font-tuple :height 1.5 :underline nil)))))
+
+
+  (deftheme ha/org-theme "Sub-theme to beautify org mode")
+
+  (ha/change-theme 'color-theme-sanityinc-tomorrow-night 'org-src-color-blocks-dark)
+
+  ;; (custom-set-faces
+  ;;     '(mode-line           ((t (:background "blue4"   :foreground "gray90"))))
+  ;;     '(mode-line-inactive  ((t (:background "#404045" :foreground "gray60"))))
+  ;;     '(mode-line-buffer-id ((t (                      :foreground "gold1"   :weight ultra-bold))))
+  ;;     '(which-func          ((t (                      :foreground "orange"))))
+  ;;     '(show-paren-match    ((t (:background "default" :foreground "#afa"    :weight ultra-bold))))
+  ;;     '(show-paren-mismatch ((t (:background "default" :foreground "#cc6666" :weight ultra-bold)))))
+  ;; (set-face-attribute 'region nil :background "#00a")
+
+  (add-to-list 'org-emphasis-alist
+  '("*" (:foreground "#E552F7")
+      ))
+      
+
+#+END_SRC
+
+* VC
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package magit
+      :ensure t)
+
+  (setq magit-ediff-dwim-show-on-hunks t)
+
+  ;; (use-package magit-delta
+  ;;    :ensure t
+  ;;    :hook (magit-mode . magit-delta-mode))
+
+  ;; (use-package evil-magit
+  ;;     :ensure t)
+
+#+END_SRC
+
+* Code analysis
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package flycheck
+    :ensure t)
+
+(use-package company
+    :ensure t
+    :config
+    (progn
+	;; (setq company-auto-complete nil)
+	(setq company-idle-delay 0.1)))
+
+(with-eval-after-load 'company
+(define-key company-active-map (kbd "M-n") nil)
+(define-key company-active-map (kbd "M-p") nil)
+(define-key company-active-map (kbd "C-n") #'company-select-next)
+(define-key company-active-map (kbd "C-p") #'company-select-previous))
+;;     (define-key company-active-map (kbd "C--") #'company-complete-common))
+;;     (define-key company-active-map [tab] 'company-complete-common-or-cycle)
+;; (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle))
+
+;; (define-key company-active-map [tab] 'company-complete-common)
+;; (define-key company-active-map (kbd "TAB") 'company-complete-common)
+;; (define-key company-active-map (kbd "M--") 'company-complete-common)
+;; (setq company-auto-complete 'company-explicit-action-p)
+
+
+
+#+END_SRC
+
+* JS/TS
+
+#+BEGIN_SRC emacs-lisp
+
+	  (defun in-template-file ()
+	    (let* ((filename (buffer-file-name))
+		   (extension (car (last (split-string filename "\\.")))))
+	      (string= "html" extension)))
+
+	  (defun jump-to-file-by-extension (extension)
+	    (let* ((filename (buffer-file-name))
+		   (file-components (append (butlast (split-string filename
+								   "\\."))
+					    (list extension))))
+	      (find-file (mapconcat 'identity file-components "."))))
+
+	  ;;; Assumes that Header and Source file are in same directory
+	  (defun objc-jump-between-header-source ()
+	    (interactive)
+	    (if (in-template-file)
+		(jump-to-file-by-extension "ts")
+	      (jump-to-file-by-extension "html")))
+
+
+	  ;; (defun objc-mode-customizations ()
+	    ;; (define-key objc-mode-map (kbd "C-c t") 'objc-jump-between-header-source))
+  (eval-after-load "mhtml-mode"
+    '(progn
+      (define-key html-mode-map (kbd "C-c c") 'objc-jump-between-header-source)
+  ))
+  (use-package typescript-mode
+    :ensure t)
+  (eval-after-load "typescript-mode"
+    '(progn
+      (define-key typescript-mode-map (kbd "C-c c") 'objc-jump-between-header-source)
+      (evil-leader/set-key "ee" 'lsp-execute-code-action)
+      (evil-leader/set-key "ef" 'lsp-find-references)
+      (evil-leader/set-key "er" 'lsp-ui-flycheck-list)
+  ))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+
+
+	  ;; (add-hook 'objc-mode-hook 'objc-mode-customizations)
+
+		  ;; (use-package js2-mode
+		  ;;     :ensure t  
+		  ;;     :mode "\\.js\\'")
+
+	  ;; 	(defun setup-tide-mode ()
+	  ;; 	    "Set up Tide mode."
+	  ;; 	    (interactive)
+	  ;; 	    (tide-setup)
+	  ;; 	    (flycheck-mode +1)
+	  ;; 	    (setq flycheck-check-syntax-automatically '(save-mode-enabled))
+	  ;; 	    (eldoc-mode +1)
+	  ;; 	    (tide-hl-identifier-mode +1)
+	  ;; 	    (company-mode +1)
+	  ;; 	    ;; (prettier-js-mode)
+	  ;; 	    (electric-pair-mode)
+	  ;; 	    (hs-minor-mode))
+
+	  ;; 	(use-package tide
+	  ;; 	    :ensure t
+	  ;; 	    :config
+	  ;; 	    (progn 
+	  ;; 	    (setq company-tooltip-align-annotations t)
+	  ;; 	    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+	  ;; 	    (add-hook 'js2-mode-hook #'setup-tide-mode)
+	  ;; 	    ;; (evil-leader/set-key "." 'tide-jump-to-definition)
+	  ;; 	    ;; (evil-leader/set-key "," 'tide-jump-back)
+	  ;; )
+	  ;; )
+
+		  ;; (add-hook 'js2-mode-hook #'setup-tide-mode)
+		  ;; (setq js2-mode-show-parse-errors nil
+		  ;;       js2-mode-show-strict-warnings nil)
+
+		  ;; (use-package indium
+		      ;; :ensure t)
+		  ;; (add-hook 'tide-mode-hook 
+		  ;; 	(progn 
+		  ;; 	  (evil-leader/set-key "." 'tide-jump-to-definition)
+		  ;; 	))
+
+		  ;; (add-hook 'js2-mode-hook #'setup-tide-mode)
+		  ;; (setq js2-mode-show-parse-errors nil
+		  ;; 	js2-mode-show-strict-warnings nil)
+	    (use-package lsp-mode
+	      :init
+	      (setq lsp-ui-doc-enable nil)
+	      (setq lsp-enable-on-type-formatting nil)
+	      (setq lsp-before-save-edits nil)
+	      (setq lsp-ui-sideline-enable nil)
+	      (setq lsp-ui-sideline-show-code-actions nil)
+              (setq lsp-ui-sideline-enable nil)
+	      (setq lsp-file-watch-threshold 2000)
+	      (setq lsp-response-timeout 20)
+              (setq lsp-use-plists t)
+
+	      :hook (
+	      (mhtml-mode . lsp) 
+	      (html-mode . lsp) 
+	      (typescript-mode . lsp)
+	      (rust-mode . lsp)
+	      (dart-mode . lsp)
+	      ;; (go-mode . lsp-deferred)
+	      (go-mode . lsp)
+	      (zig-mode . lsp)
+              (haskell-mode . lsp)
+	      ;; (before-save . lsp-organize-imports)
+	      )
+	      :commands (lsp lsp-deferred))
+	      ;; :config
+
+  
+      (setq flymake-no-changes-timeout 2)
+
+	;; (use-package lsp-ui 
+	;;   :ensure t 
+	;;   :commands lsp-ui-mode
+	;;   :config 
+	;;   (setq 
+	;;       lsp-ui-sideline-enable t
+	;; 	lsp-ui-doc-enable nil
+	;; 	lsp-ui-flycheck-enable t
+	;; 	lsp-ui-imenu-enable t
+	;; 	lsp-ui-sideline-ignore-duplicate t))
+
+	;; (use-package company-lsp 
+	;; 	:ensure t 
+	;; 	:commands company-lsp
+	;; 	:config 
+	;; 	(push 'company-lsp company-backends) 
+	;; 	(setq company-lsp-async t) 
+	;; 	(setq company-lsp-cache-candidates 'auto))
+
+    (use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
+
+  (setenv "TSSERVER_LOG_FILE" "/dev/null")
+
+
+
+
+	    (setq lsp-clients-angular-language-server-command
+	      '("node"
+		  "//home/konstantin_matsiushonak//.nvm/versions/node/v14.18.3/lib/node_modules/@angular/language-server"
+		  "--ngProbeLocations"
+		  "//home/konstantin_matsiushonak//.nvm/versions/node/v14.18.3/lib"
+		  "--tsProbeLocations"
+		  "//home/konstantin_matsiushonak//.nvm/versions/node/v14.18.3/lib"
+		  "--stdio"))
+
+	      (use-package prettier-js
+		  :ensure t)
+
+	      (use-package add-node-modules-path
+		  :ensure t)
+
+              (setq add-node-modules-path-debug t)
+
+	      (eval-after-load 'typescript-mode
+		  '(progn
+		      (add-hook 'typescript-mode-hook #'tree-sitter-mode)
+		      (add-hook 'typescript-mode-hook #'tree-sitter-hl-mode)
+		      (add-hook 'typescript-mode-hook #'add-node-modules-path)
+		      (add-hook 'typescript-mode-hook #'prettier-js-mode)))
+
+	    (add-hook 'json-mode-hook 
+	      (lambda ()
+		(prettier-js-mode -1)))
+
+
+
+
+#+END_SRC
+
+#+RESULTS:
+| lambda | nil | (prettier-js-mode -1) |
+
+* LSP
+
+#+BEGIN_SRC emacs-lisp
+
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
+  (setq lsp-prefer-capf t)
+  (setq lsp-idle-delay 0.500)
+  (setq lsp-log-io nil)
+  (setq flycheck-checker-error-threshold 5000)
+
+
+    ;; (use-package lsp-mode
+    ;;   :ensure t
+    ;;   :init
+    ;;   (add-hook 'prog-major-mode #'lsp-prog-major-mode-enable)
+    ;;   ;; (lsp-ui-mode nil)
+    ;;   ;; (flymake-mode nil)
+    ;;   :config
+    ;;   ;; (setq lsp-response-timeout 25)
+    ;;   (setq lsp-auto-configure t)
+    ;;   (setq lsp-prefer-flymake nil)
+    ;;   )
+
+
+    ;; (use-package lsp-ui
+    ;; 	 :ensure t
+    ;; 	 :init
+    ;; 	 (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+    ;; 	 :config
+    ;; 	 ;; (setq lsp-ui-sideline-enable t
+    ;; 	 ;; 	  lsp-ui-sideline-show-symbol t
+    ;; 	 ;; 	  lsp-ui-sideline-show-hover t
+    ;; 	 ;; 	  lsp-ui-sideline-show-code-actions t
+    ;; 	 ;; 	  lsp-ui-sideline-update-mode 'point)
+    ;; 	 (setq lsp-ui-doc-enable nil
+    ;; 	   lsp-ui-peek-enable nil
+    ;; 	   lsp-ui-sideline-enable nil
+    ;; 	   lsp-ui-imenu-enable nil
+    ;; 	   ;; lsp-ui-flycheck-enable nil
+    ;; 	   ))
+
+
+    ;; (require 'lsp)
+    ;; (require 'lsp-clients)
+    ;; (add-hook 'js-mode-hook #'lsp)
+
+
+
+    ;; (defcustom lsp-on-change-idle-timer-timeout 0.2
+    ;;   "Timeout to send `textDocument/didChange' notification"
+    ;;   :group 'lsp-mode
+    ;;   :type 'number)
+
+    ;; (defvar lsp-on-change-idle-timer-id nil)
+
+    ;; (defun my-lsp-on-change-timer-advice (orig-func &rest args)
+    ;;   "Add an idle timer to lsp-on-change"
+    ;;   (-some->> lsp-on-change-idle-timer-id (cancel-timer))
+    ;;   (setq lsp-on-change-idle-timer-id
+    ;; 	(run-with-idle-timer lsp-on-change-idle-timer-timeout nil
+    ;; 			     (lambda ()
+    ;; 			       (funcall orig-func (point-min) (point-max) (- (point-max) (point-min)))
+    ;; 			       (setq lsp-on-change-idle-timer-id nil)))))
+
+    ;; (advice-add 'lsp-on-change :around 'my-lsp-on-change-timer-advice)
+
+    ;; (add-hook 'typescript-mode-hook #'lsp)
+    ;; (require 'lsp-javascript-typescript)
+
+
+    ;; (use-package lsp-javascript-typescript
+    ;;   :ensure t
+    ;;   :init
+    ;;   (add-to-list 'js-mode-hook #'lsp-javascript-typescript-enable)
+    ;;   (add-to-list 'typescript-mode-hook #'lsp-javascript-typescript-enable))
+
+
+    (use-package eglot
+	:ensure t)
+
+    ;; (add-hook 'js-mode-hook 'eglot-ensure)
+    ;; (add-hook 'typescript-mode-hook 'eglot-ensure)
+    ;; (add-hook 'tide 'eglot-ensure)
+  
+  ;; (lsp-clients-register-clangd)
+  ;; (add-hook 'c++-mode-hook 'lsp)
+
+  ;; (require 'eglot)
+  ;; (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  ;; (add-hook 'c-mode-hook 'eglot-ensure)
+  ;; (add-hook 'c++-mode-hook 'eglot-ensure)
+
+#+END_SRC
+
+* Parens
+
+#+BEGIN_SRC emacs-lisp
+
+  ;; (use-package paredit
+  ;;   :ensure t
+  ;;   :init
+  ;;   (progn
+  ;;     (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+  ;;     (add-hook 'clojure-mode-hook 'paredit-mode)
+  ;;     (add-hook 'clojurescript-mode-hook 'paredit-mode)
+  ;;     (add-hook 'clojurec-mode-hook 'paredit-mode)
+  ;;     (add-hook 'cider-repl-mode-hook 'paredit-mode)))
+
+  ;; (use-package parinfer
+  ;;     :ensure t
+  ;;     :init 
+  ;;     (progn
+  ;;     (add-hook 'clojure-mode-hook 'parinfer-mode)
+  ;;     (add-hook 'clojurescript-mode-hook 'parinfer-mode)
+  ;;     (add-hook 'clojurec-mode-hook 'parinfer-mode)
+  ;;     (add-hook 'cider-repl-mode-hook 'parinfer-mode)))
+
+  (use-package paren-face
+      :ensure t
+      :init
+      ;;  (global-paren-face-mode)
+      :config
+      (add-hook 'clojure-mode-hook (lambda () (setq paren-face-regexp "#?[](){}[]"))))
+
+#+END_SRC
+
+* Clojure/Clojurescript
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package clojure-mode
+    :mode (("\\.edn$" . clojure-mode))
+    :config
+    (progn
+    (setq clojure-align-forms-automatically t)
+
+    (define-clojure-indent
+	(defroutes 'defun)
+	(GET 2)
+	(POST 2)
+	(PUT 2)
+	(DELETE 2)
+	(HEAD 2)
+	(ANY 2)
+	(context 2)
+	(let-routes 1))
+
+    (define-clojure-indent
+	(form-to 1))
+
+    (define-clojure-indent
+	(match 1)
+	(are 2)
+	(checking 2)
+	(async 1))
+
+    (define-clojure-indent
+	(select 1)
+	(insert 1)
+	(update 1)
+	(delete 1))
+
+    (define-clojure-indent
+	(run* 1)
+	(fresh 1))
+
+    (define-clojure-indent
+	(extend-freeze 2)
+	(extend-thaw 1))
+
+    (define-clojure-indent
+	(go-loop 1))
+
+    (define-clojure-indent
+	(this-as 1)
+	(specify 1)
+	(specify! 1))
+
+    (define-clojure-indent
+	(s/fdef 1))
+
+    (setq clojure--prettify-symbols-alist
+	    '(("fn" . ?λ)))
+
+    (defun toggle-nrepl-buffer ()
+	"Toggle the nREPL REPL on and off"
+	(interactive)
+	(if (string-match "cider-repl" (buffer-name (current-buffer)))
+	    (delete-window)
+	(cider-switch-to-repl-buffer)))
+
+    (defun cider-save-and-refresh ()
+	(interactive)
+	(save-buffer)
+	(call-interactively 'cider-refresh))
+
+    (defun cider-eval-last-sexp-and-append ()
+	(interactive)
+	(cider-eval-last-sexp '(1)))
+
+    (evil-leader/set-key "eb" 'cider-eval-buffer)
+    (evil-leader/set-key "el" 'cider-eval-last-sexp)
+    (evil-leader/set-key "er" 'cider-eval-region)
+    (evil-leader/set-key "ee" 'cider-eval-defun-at-point)
+    ;; (evil-leader/set-key "ea" 'cider-eval-last-sexp-and-append)
+    (evil-leader/set-key "ec" 'cider-eval-last-sexp-and-replace)
+    ;; (evil-leader/set-key "ef" 'cider-eval-sexp-at-point)
+    (evil-leader/set-key "ea" 'cider-eval-buffer)
+    (evil-leader/set-key "et" 'cider-test-run-test)
+
+    (evil-leader/set-key "cd" 'cider-doc)
+    (evil-leader/set-key "cc" 'cider-connect)
+    (evil-leader/set-key "cj" 'cider-jack-in)
+    (evil-leader/set-key "cJ" 'cider-jack-in-clj&cljs)
+    (evil-leader/set-key "ct" 'cider-test-run-ns-tests)
+    (evil-leader/set-key "cT" 'cider-test-run-project-tests)
+    (evil-leader/set-key "cn" 'cider-repl-set-ns)
+    (evil-leader/set-key "cr" 'toggle-nrepl-buffer)
+    (evil-leader/set-key "cf" 'cider-save-and-refresh)
+    (evil-leader/set-key "ci" 'cider-inspect-last-result)
+
+
+    (global-set-key (kbd "s-r") 'cider-save-and-refresh)))
+
+(use-package cider
+    :ensure t
+    :config
+    (progn
+    (setq nrepl-hide-special-buffers t)
+    (setq cider-popup-stacktraces-in-repl t)
+    (setq cider-repl-history-file "~/.emacs.d/nrepl-history")
+    (setq cider-repl-pop-to-buffer-on-connect nil)
+    (setq cider-auto-select-error-buffer nil)
+    (setq cider-prompt-save-file-on-load nil)
+    (setq cider-repl-display-help-banner nil)
+    (setq cider-repl-use-pretty-printing t)
+    (setq cider-refresh-before-fn "reloaded.repl/suspend")
+    (setq cider-refresh-after-fn "reloaded.repl/resume")
+    (setq cider-cljs-lein-repl "(do (reloaded.repl/go) (user/cljs-repl))")
+    (setq cider-prompt-for-symbol nil)
+
+    (evil-define-key '(insert normal) cider-mode-map
+	(kbd "M-.") 'cider-find-var
+	(kbd "M-,") 'cider-pop-back)))
+
+(require 'ob)
+(require 'ob-clojure)
+(setq org-babel-clojure-backend 'cider)
+
+(setq cljr-middleware-ignored-paths '("test\.*"))
+(remove-hook 'text-mode-hook 'turn-on-auto-fill)
+
+(add-hook 'clojure-mode-hook 'prettify-symbols-mode)
+(add-hook 'clojure-mode-hook 'idle-highlight-mode)
+
+(use-package pg
+    :ensure t)
+
+#+END_SRC
+
+* Rust
+#+BEGIN_SRC emacs-lisp
+
+    (use-package rust-mode
+	:ensure t)
+
+    ;; (use-package racer
+    ;;     :ensure t)
+
+    ;; (add-hook 'rust-mode-hook #'racer-mode)
+    ;; (remove-hook 'rust-mode-hook 'racer-mode t)
+
+    ;; (add-hook 'rust-mode-hook #'lsp-ui-mode)
+
+    ;; (add-hook 'racer-mode-hook #'eldoc-mode)
+    ;; (remove-hook 'rust-mode-hook #'eldoc-mode t)
+
+    ;; (add-hook 'racer-mode-hook #'company-mode)
+    ;; (remove-hook 'rust-mode-hook #'company-mode t)
+    (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
+    (setq company-tooltip-align-annotations t)
+    (setq rust-format-on-save t)
+
+    (setq lsp-rust-server 'rust-analyzer)
+
+    (setq rustic-lsp-server 'rust-analyzer)
+    (setq rustic-format-on-save t)
+
+    (add-hook
+       'rust-mode-hook
+       (lambda ()
+	 (setq-local electric-pair-inhibit-predicate
+		     `(lambda (c)
+			(if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))
+	 (electric-pair-mode)
+	 (evil-leader/set-key "ee" 'lsp-execute-code-action)
+	 (setq lsp-ui-mode nil)
+	 (setq lsp-rust-analyzer-cargo-watch-command "check")
+	 (setq lsp-rust-analyzer-cargo-watch-enable t)
+	 (setq lsp-rust-analyzer-inlay-hints-mode t)
+	 (setq lsp-rust-analyzer-display-chaining-hints t)
+	 (setq lsp-rust-analyzer-display-parameter-hints t)
+	 (setq lsp-rust-analyzer-server-display-inlay-hints t)
+    ))
+    (add-hook 'rust-mode-hook #'(lambda () (flycheck-mode)))
+    (add-hook 'rust-mode-hook #'tree-sitter-mode)
+    (add-hook 'rust-mode-hook #'tree-sitter-hl-mode)
+
+
+
+
+    (use-package cargo
+	:ensure t)
+    (setq cargo-process--command-test "ltest")
+    (setq cargo-process--command-current-test "ltest")
+    (setq cargo-process--command-current-file-tests "ltest")
+    (setq cargo-process--command-check "lcheck")
+    (add-hook 'rust-mode-hook #'cargo-minor-mode)
+
+    (use-package flycheck-rust
+	:ensure t)
+
+    (add-hook 'rust-mode-hook #'flycheck-rust-setup)
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;;;;;;; Debug ;;;;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+#+END_SRC
+
+* Flutter
+
+#+BEGIN_SRC emacs-lisp
+
+  (setq lsp-dart-sdk-dir "/home/konstantin_matsiushonak/snap/flutter/common/flutter/bin/cache/dart-sdk")
+  (setq lsp-dart-flutter-sdk-dir "/home/konstantin_matsiushonak/snap/flutter/common/flutter")
+  (setq lsp-dart-dap-flutter-hot-reload-on-save t)
+  (setq lsp-dart-flutter-widget-guides nil)
+  (setq lsp-dart-flutter-fringe-colors nil)
+  (setq lsp-dart-flutter-fringe-colors nil)
+  (setq lsp-dart-outline nil)
+  (setq lsp-dart-flutter-outline nil)
+  (setq lsp-dart-closing-labels nil)
+  (setq lsp-dart-main-code-lens nil)
+  (setq lsp-dart-test-code-lens nil)
+  
+(use-package dart-mode
+  :ensure t 
+  :mode ("\\.dart\\'")
+  :hook ((dart-mode . (lambda ()
+                        (add-hook 'lsp-mode-hook
+                                  (lambda ()
+                                    (add-hook 'before-save-hook #'lsp-format-buffer nil t)
+                                    (add-hook 'before-save-hook #'lsp-organize-imports nil t)))
+                        ))
+         )
+  )
+
+(use-package hover :ensure t)
+
+#+END_SRC
+
+* Not categorized
+
+#+BEGIN_SRC emacs-lisp
+
+  ;; (use-package google-translate
+  ;;     :ensure t
+  ;;     :config
+  ;;     (setq google-translate-default-source-language "en")
+  ;;     (setq google-translate-default-target-language "ru"))
+    
+#+END_SRC
+* Dash
+
+#+BEGIN_SRC emacs-lisp
+
+(setq counsel-dash-browser-func 'eww-browse-url)
+  
+
+#+END_SRC
+
+* Pomidor
+#+BEGIN_SRC emacs-lisp
+
+  (setq alert-default-style 'mode-line)
+  ;; (use-package pomidor
+  ;;   :ensure t
+  ;;   :config (setq pomidor-sound-tick nil
+  ;; 		pomidor-sound-tack nil)
+  ;;   :hook (pomidor-mode . (lambda ()
+  ;; 			  (display-line-numbers-mode -1) ; Emacs 26.1+
+  ;; 			  (setq left-fringe-width 0 right-fringe-width 0)
+  ;; 			  (setq left-margin-width 2 right-margin-width 0)
+  ;; 			  ;; force fringe update
+  ;; 			  (set-window-buffer nil (current-buffer)))))
+  
+  ;; (pomodoro-add-to-mode-line)
+
+#+END_SRC
+
+* Ediff
+#+BEGIN_SRC emacs-lisp
+
+(custom-set-variables
+ '(ediff-window-setup-function 'ediff-setup-windows-plain)
+ '(ediff-diff-options "-w")
+ '(ediff-split-window-function 'split-window-horizontally))
+
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+
+(setq ediff-combination-pattern '("" A "" B "" Ancestor))
+
+#+END_SRC
+* GO
+
+  #+BEGIN_SRC emacs-lisp
+
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+#+END_SRC
+
+* Sound
+
+#+BEGIN_SRC emacs-lisp
+
+(setq visible-bell 1)
+(setq ring-bell-function 'ignore)
+
+#+END_SRC
+
+
+* Zig
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package zig-mode
+    :ensure t)
+
+(setq lsp-zig-zls-executable "/home/konstantin_matsiushonak/build/zls/zls")
+
+#+END_SRC
+
+* Python
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package python-black
+  :ensure t
+  :after python
+  :hook (python-mode . python-black-on-save-mode))
+
+#+END_SRC
+
+* Haskell
+
+#+BEGIN_SRC emacs-lisp
+  
+(use-package lsp-haskell
+  :ensure t)
+
+(defun lsp-haskell-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'haskell-mode-hook #'lsp-haskell-install-save-hooks)
+(add-hook 'haskell-mode-hook #'lsp)
+(add-hook 'haskell-literate-mode-hook #'lsp)
+
+;; (require 'lsp-haskell)
+;; Hooks so haskell and literate haskell major modes trigger LSP setup
+;; (add-hook 'haskell-mode-hook #'lsp)
+;; (add-hook 'haskell-literate-mode-hook #'lsp)
+
+#+END_SRC
+
+* Dap
+
+#+BEGIN_SRC emacs-lisp
+
+  (with-eval-after-load 'lsp-rust
+    (require 'dap-lldb)
+    (require 'dap-gdb-lldb)
+    (require 'dap-cpptools)
+    )
+
+;;  (require 'dap-cpptools)
+
+;; (with-eval-after-load 'dap-cpptools
+;;    ;; Add a template specific for debugging Rust programs.
+;;    ;; It is used for new projects, where I can M-x dap-edit-debug-template
+;;    (dap-register-debug-template "Rust::CppTools Run Configuration"
+;;                                 (list :type "cppdbg"
+;;                                       :request "launch"
+;;                                       :name "Rust::Run"
+;;                                       :MIMode "gdb"
+;;                                      :miDebuggerPath "rust-gdb"
+;;                                      :environment []
+;;;;;;                                     :program "${workspaceFolder}/target/debug/kakoc"
+;;                                       :cwd "${workspaceFolder}"
+;;                                       :console "external"
+;;                                       :dap-compilation "cargo build"
+;;                                       :dap-compilation-dir "${workspaceFolder}")))
+
+  (require 'dap-gdb-lldb)
+
+(dap-register-debug-template "Rust::GDB Run Configuration"
+                             (list :type "gdb"
+                                   :request "launch"
+                                   :name "GDB::Run"
+                           :gdbpath "rust-gdb"
+                                   :target nil
+                                   :cwd nil))
+
+(use-package dap-mode
+  :ensure t
+  :config
+  (dap-ui-mode)
+  (dap-ui-controls-mode 1)
+
+  (require 'dap-lldb)
+  (require 'dap-gdb-lldb)
+  ;; installs .extension/vscode
+  (dap-gdb-lldb-setup)
+  (dap-register-debug-template
+   "Rust::LLDB Run Configuration"
+   (list :type "lldb"
+         :request "launch"
+         :name "LLDB::Run"
+	 :gdbpath "rust-lldb"
+         :target nil
+         :cwd nil)))
+
+
+;;  (use-package dap-gdb-lldb
+;;     :ensure t)
+
+;; (with-eval-after-load 'dap-mode
+;;    (setq dap-default-terminal-kind "integrated") ;; Make sure that terminal programs open a term for I/O in an Emacs buffer
+;;    (dap-auto-configure-mode +1))
+
+
+#+END_SRC
+
+
+
