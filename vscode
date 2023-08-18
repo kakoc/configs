@@ -1,130 +1,74 @@
 {
-  "window.zoomLevel": -1,
-  "workbench.colorCustomizations": {
-    "statusBar.background": "#005f5f",
-    "statusBar.noFolderBackground": "#005f5f",
-    "statusBar.debuggingBackground": "#005f5f",
-    "editorWhitespace.foreground": "#5C6F6F"
+  "editor.fontSize": 16,
+  "terminal.integrated.fontSize": 16,
+  "editor.inlineSuggest.enabled": true,
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnType": false,
+    "editor.rulers": [
+      80
+    ],
+    "editor.selectionHighlight": false,
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": false
   },
-  "workbench.colorTheme": "Atom One Dark",
-  // "todohighlight.keywords": [
-  //   {
-  //     "text": "Task",
-  //     "color": "white",
-  //     // "backgroundColor": "rgb(253,188,62)",
-  //     "backgroundColor": "rgb(238,100,146)",
-  //     "overviewRulerColor": "grey"
-  //   }
-  // ],
-  "files.exclude": {
-    "**/.git": false,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false
   },
-  "explorer.confirmDelete": false,
   "editor.minimap.enabled": false,
-  "explorer.confirmDragAndDrop": false,
-  // "liveServer.settings.donotShowInfoMsg": true,
+  "window.menuBarVisibility": "toggle",
 
-  "editor.autoIndent": true,
-  "editor.renderWhitespace": "boundary",
-
-  //font
-  "editor.fontLigatures": true,
-  "editor.fontFamily": "Fira Code",
-
-  //saving
-  "files.autoSaveDelay": 3000,
-  "files.autoSave": "afterDelay",
-
-  //formatting
-  "editor.formatOnSave": true,
-  "editor.formatOnPaste": true,
-  "editor.snippetSuggestions": "top",
-
-  //vim
-  "vim.easymotion": true,
-  "vim.sneak": true,
-  "vim.incsearch": true,
+  // vim
+  "vim.leader": "<space>",
   "vim.useSystemClipboard": true,
-  "vim.useCtrlKeys": true,
-  "vim.hlsearch": true,
-  "vim.insertModeKeyBindings": [
-    {
-      "before": ["j", "j"],
-      "after": ["<Esc>"]
-    }
-  ],
   "vim.normalModeKeyBindingsNonRecursive": [
     {
-      "before": ["<leader>", "d"],
-      "after": ["d", "d"]
+      "before": ["<Leader>", "b"],
+      "commands": ["workbench.action.navigateLast"]
     },
     {
-      "before": ["<leader>", "s"],
-      "after": ["d", "d", "O"]
+      "before": ["<Leader>", "e", "f"],
+      "commands": ["references-view.findReferences"]
     },
     {
-      "before": ["<leader>", "c"],
-      "after": ["v", "i", "w", "p"]
+      "before": ["<Leader>", "c", "f"],
+      "commands": ["testing.debugAtCursor"]
     },
     {
-      "before": ["<C-n>"],
-      "commands": [":nohl"]
+      "before": ["<Leader>", "c", "t"],
+      "commands": ["testing.debugCurrentFile"]
     }
   ],
-  "vim.leader": "<space>",
-  "vim.handleKeys": {
-    "<C-a>": false,
-    "<C-f>": false,
-    "<C-v>": false
+
+  // disable vertical ruler which highlight a certain width of the input file
+  "editor.rulers": [],
+  "workbench.colorTheme": "Tomorrow Night",
+  "editor.tokenColorCustomizations": {
+    "keywords": "#b5bd68",
+    "variables": "#c5c8c6",
+    "types": "#af92b9",
+    "numbers": "#af92b9"
   },
-  "vim.foldfix": true,
 
-  //git
-  "git.path": "/usr/bin/git",
-  "git.autoRepositoryDetection": "subFolders",
+  "workbench.colorCustomizations": {
+      "editorInlayHint.foreground": "#a2a4a3",
+      "editorInlayHint.background": "#0000",
+      "errorLens.infoBackground": "#0000",
+      "editorCursor.foreground": "#d73bd7",
+      "editorCursor.background": "#000000"
+  },
+  "window.zoomLevel": 1,
+  "editor.guides.indentation": false,
+  "debug.allowBreakpointsEverywhere": true,
+  "workbench.editor.showTabs": false,
+  "workbench.statusBar.visible": false,
+  "editor.renderLineHighlight": "none",
+  "diffEditor.renderSideBySide": false,
+  "haskell.manageHLS": "GHCup",
 
-  //tag renaming
-  "auto-rename-tag.activationOnLanguage": [
-    "html",
-    "xml",
-    "php",
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
-
-  //close tags
-  "auto-close-tag.activationOnLanguage": [
-    "xml",
-    "php",
-    "blade",
-    "ejs",
-    "jinja",
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact",
-    "plaintext",
-    "markdown",
-    "vue",
-    "liquid",
-    "erb",
-    "lang-cfml",
-    "cfml",
-    "HTML (Eex)"
-  ],
-
-  "workbench.editor.enablePreview": false,
-  "workbench.editor.enablePreviewFromQuickOpen": false,
-
-  //ts
-  "prettier.tslintIntegration": true,
-
-  //wallaby
-  "wallaby.node": "/Users/kakoc/.nvm/versions/node/v10.9.0/bin/node"
 }
