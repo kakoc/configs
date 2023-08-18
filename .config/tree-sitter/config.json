@@ -1,0 +1,56 @@
+{
+  "parser-directories": [
+    "/home/konstantin_matsiushonak/github",
+    "/home/konstantin_matsiushonak/src",
+    "/home/konstantin_matsiushonak/source"
+  ],
+  "theme": {
+    "module": 136,
+    "punctuation.delimiter": 239,
+    "attribute": {
+      "italic": true,
+      "color": 124
+    },
+    "keyword": 56,
+    "string": 28,
+    "type.builtin": {
+      "color": 23,
+      "bold": true
+    },
+    "tag": 18,
+    "variable.parameter": {
+      "underline": true
+    },
+    "property": 124,
+    "constant": 94,
+    "function.builtin": {
+      "color": 26,
+      "bold": true
+    },
+    "variable.builtin": {
+      "bold": true
+    },
+    "comment": {
+      "color": 245,
+      "italic": true
+    },
+    "type": 23,
+    "number": {
+      "bold": true,
+      "color": 94
+    },
+    "constructor": 136,
+    "constant.builtin": {
+      "bold": true,
+      "color": 94
+    },
+    "function": 26,
+    "punctuation.bracket": 239,
+    "string.special": 30,
+    "operator": {
+      "bold": true,
+      "color": 239
+    },
+    "embedded": null
+  }
+}
